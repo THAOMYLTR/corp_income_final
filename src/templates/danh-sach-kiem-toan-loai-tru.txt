@@ -1,0 +1,3 @@
+# [Guidance 05/11] Công ty kiểm toán thuộc danh sách loại trừ (Bad finance tiêu chí a). Mỗi dòng một tên.
+# Dòng bắt đầu bằng # là ghi chú. MST 0102662764.
+CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN

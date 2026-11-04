@@ -1,0 +1,46 @@
+# [05/11/2026] Bộ viết tắt tên ngân hàng (sheet bank_abbr). Mỗi dòng: Tên viết tắt(Mã): Tên đầy đủ.
+# Bảng dư nợ tại TCTD (mục 4a) hiển thị phần trước dấu "(" — vd "Vietcombank". "(tên cũ: …)" cũng được nhận.
+Agribank: Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam
+BIDV: Ngân hàng TMCP Đầu tư và Phát triển Việt Nam
+Vietcombank(VCB): Ngân hàng TMCP Ngoại thương Việt Nam
+VietinBank(CTG): Ngân hàng TMCP Công Thương Việt Nam
+ABBank(ABB): Ngân hàng TMCP An Bình
+ACB: Ngân hàng TMCP Á Châu
+Bac A Bank(BAB): Ngân hàng TMCP Bắc Á
+BaoViet Bank(BVB): Ngân hàng TMCP Bảo Việt
+BVBank(BVB): Ngân hàng TMCP Bản Việt (tên cũ: Viet Capital Bank)
+DongA Bank(DAB): Ngân hàng TMCP Đông Á
+Eximbank(EIB): Ngân hàng TMCP Xuất Nhập Khẩu Việt Nam
+GPBank: Ngân hàng Thương mại TNHH MTV Dầu Khí Toàn Cầu
+HDBank(HDB): Ngân hàng TMCP Phát triển Thành phố Hồ Chí Minh
+Kienlongbank(KLB): Ngân hàng TMCP Kiên Long
+LPBank(LPB): Ngân hàng TMCP Lộc Phát Việt Nam
+MB/MBBank(MBB): Ngân hàng TMCP Quân Đội
+MSB: Ngân hàng TMCP Hàng Hải Việt Nam
+Nam A Bank(NAB): Ngân hàng TMCP Nam Á
+NCB: Ngân hàng TMCP Quốc Dân
+OceanBank: Ngân hàng Thương mại TNHH MTV Đại Dương
+OCB: Ngân hàng TMCP Phương Đông
+PG Bank(PGB): Ngân hàng TMCP Thịnh vượng và Phát triển (tên cũ: TMCP Xăng dầu Petrolimex)
+PVcomBank: Ngân hàng TMCP Đại Chúng Việt Nam
+Sacombank(STB): Ngân hàng TMCP Sài Gòn Thương Tín
+Saigonbank(SGB): Ngân hàng TMCP Sài Gòn Công Thương
+SCB: Ngân hàng TMCP Sài Gòn
+SeABank(SSB): Ngân hàng TMCP Đông Nam Á
+SHB: Ngân hàng TMCP Sài Gòn - Hà Nội
+Techcombank(TCB): Ngân hàng TMCP Kỹ Thương Việt Nam
+TPBank(TPB): Ngân hàng TMCP Tiên Phong
+VIB: Ngân hàng TMCP Quốc Tế Việt Nam
+VietBank(VBB): Ngân hàng TMCP Việt Nam Thương Tín
+VietABank(VAB): Ngân hàng TMCP Việt Á
+VPBank(VPB): Ngân hàng TMCP Thịnh Vượng Việt Nam
+HSBC Việt Nam: Ngân hàng TNHH MTV HSBC Việt Nam
+Shinhan Bank: Ngân hàng TNHH MTV Shinhan Việt Nam
+Standard Chartered: Ngân hàng TNHH MTV Standard Chartered Việt Nam
+UOB Việt Nam: Ngân hàng TNHH MTV United Overseas Bank Việt Nam
+CIMB Việt Nam: Ngân hàng TNHH MTV CIMB Việt Nam
+Hong Leong Bank: Ngân hàng TNHH MTV Hong Leong Việt Nam
+Woori Bank: Ngân hàng TNHH MTV Woori Việt Nam
+Public Bank: Ngân hàng TNHH MTV Public Bank Việt Nam
+VBSP: Ngân hàng Chính sách Xã hội Việt Nam
+VDB: Ngân hàng Phát triển Việt Nam

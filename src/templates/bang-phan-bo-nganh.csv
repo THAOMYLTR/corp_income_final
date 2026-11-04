@@ -1,0 +1,20 @@
+# [05/11/2026] Bảng phân bổ ngành nghề: tỷ trọng thông thường của từng khoản mục trong TÀI SẢN NGẮN HẠN,
+# theo loại hình doanh nghiệp (cột "Loại hình doanh nghiệp" của bang-nganh-tcb.csv). Tỷ lệ: 0.05 = 5%.
+STT,Loại hình doanh nghiệp,Tiền min,Tiền max,ĐTTC NH min,ĐTTC NH max,Phải thu NH min,Phải thu NH max,HTK min,HTK max,Đặc thù
+1,Ngân hàng Thương mại,0.05,0.1,0.15,0.25,0.6,0.7,0,0,"Phải thu là dư nợ cho vay. Đầu tư ngắn hạn là giấy tờ có giá, trái phiếu. Không có tồn kho."
+2,Bán lẻ & Thương mại,0.15,0.25,0.05,0.15,0.05,0.1,0.35,0.5,Tồn kho lớn. Phải thấp vì người tiêu dùng thường trả tiền ngay khi mua hàng.
+3,Công nghệ & Phần mềm,0.35,0.5,0.2,0.35,0.2,0.3,0,0.05,Tiền mặt và tiền gửi tiết kiệm lớn. Tài sản có chất lượng và tính thanh khoản cao.
+4,Bất động sản Nhà ở,0.05,0.15,0.05,0.1,0.15,0.25,0.4,0.6,"Tồn kho lớn (quỹ đất, dự án dở dang). Phải thu là tiền khách mua nhà chưa đóng theo tiến độ."
+5,Bất động sản Khu công nghiệp,0.2,0.35,0.15,0.3,0.3,0.45,0.05,0.15,Tồn kho thấp (do hạ tầng cho thuê nằm ở TS dài hạn). Phải thu chủ yếu là tiền bán đất KCN trả chậm.
+6,Sản xuất Công nghiệp nặng,0.1,0.2,0.05,0.15,0.25,0.35,0.3,0.45,"Tồn kho gồm nguyên vật liệu (quặng, than...) và thành phẩm. Phải thu là công nợ cho các đại lý."
+7,Sản xuất Hàng tiêu dùng (F&B),0.2,0.3,0.2,0.3,0.15,0.25,0.25,0.35,"Dòng tiền mạnh, tích lũy tiền gửi ngắn hạn nhiều. Hàng tồn kho luân chuyển nhanh, ít bị ứ đọng."
+8,Xây dựng & Thầu hạ tầng,0.05,0.1,0,0.05,0.5,0.65,0.25,0.35,Rủi ro cao nằm ở Phải thu(do chủ đầu tư chiếm dụng vốn). Tồn kho là chi phí dở dang tại công trình.
+9,"Điện, Nước & Tiện ích",0.3,0.45,0.15,0.25,0.3,0.4,0.05,0.1,Tiền mặt tỷ trọng cao nhờ thu tiền định kỳ. Phải thu là hóa đơn chưa đến hạn.
+10,Cảng biển & Logistics,0.35,0.5,0.15,0.25,0.25,0.35,0,0.05,Do bán dịch vụ nên hàng tồn kho gần như bằng không. Tiền mặt tích lũy từ hoạt động kinh doanh lớn.
+11,Dầu khí (Thượng & Hạ nguồn),0.2,0.35,0.15,0.25,0.2,0.35,0.2,0.3,"Cấu trúc tương đối cân bằng. Hàng tồn kho (dầu thô, xăng dầu kinh doanh) chịu rủi ro biến động giá thế giới."
+12,Hóa chất & Phân bón,0.15,0.25,0.2,0.35,0.15,0.25,0.25,0.4,Thường tích lũy lượng tiền gửi ngắn hạn lớn khi vào chu kỳ ngành tốt. Tồn kho biến động theo mùa vụ nông nghiệp.
+13,Dệt may & Da giày (Xuất khẩu),0.1,0.2,0.05,0.15,0.25,0.4,0.35,0.45,"Phải thu lớn do các đối tác thường thanh toán chậm (30-90 ngày). Tồn kho chủ yếu là vải, xơ sợi, nguyên liệu."
+14,"Thủy sản xuất khẩu(Tôm, Cá)",0.05,0.15,0.05,0.1,0.25,0.35,0.25,0.55,"Hàng tồn kho chiếm tỷ trọng lớn (chi phí nuôi trồng, thành phẩm đông lạnh bảo quản kho lạnh chi phí cao)."
+15,Nông nghiệp & Chăn nuôi,0.05,0.15,0,0.1,0.2,0.35,0.45,0.6,"Tồn kho cao và đặc biệt vì gồm cảTài sản sinh học ngắn hạn(heo, gà, bò thịt, thức ăn chăn nuôi, hạt giống)."
+16,Y tế & Dược phẩm,0.15,0.25,0.1,0.2,0.25,0.35,0.3,0.4,Tồn kho là thuốc và nguyên liệu dược phẩm. Phải thu khá lớn nếu bán kênh bệnh viện.
+17,Dịch vụ(du lịch/khách sạn/giáo dục/ giải trí/y tế),0.25,0.45,0.1,0.2,0.1,0.3,0,0.1,"Tồn kho rất nhỏ hoặc không đáng kể (chủ yếu là công cụ dụng cụ, đồ dùng). Dòng tiền mặt về nhanh. Phải thu chủ yếu từ các đại lý."

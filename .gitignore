@@ -1,0 +1,35 @@
+# Secrets / environment
+.env
+.env.*
+!.env.example
+
+# Logs / run outputs
+logs/
+
+# Customer data — never commit
+samples/
+
+# Internal docs (the BRD rows this repo implements are kept)
+docs/*
+!docs/*.md
+!docs/BRD_corp_income_items_1-4.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OCR / caches
+.cache/
+*.tmp
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

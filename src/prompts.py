@@ -1,0 +1,67 @@
+"""Every system prompt lives in config/prompts/<name>.md; this is the only reader."""
+
+from __future__ import annotations
+
+import re
+from functools import lru_cache
+
+from src.utils.paths import PROJECT_ROOT
+
+PROMPT_DIR = PROJECT_ROOT / "config" / "prompts"
+_PLACEHOLDER = re.compile(r"\{\{([A-Za-z0-9_]+)\}\}")
+
+PROMPTS: dict[str, frozenset[str]] = {
+    # BRD Corp Income items 1-4: one extraction pass each.
+    "legal_basic_extraction": frozenset(),
+    "shareholders_extraction": frozenset(),
+    "legal_rep_extraction": frozenset(),
+    "liabilities_extraction": frozenset(),
+    # Phụ lục 01: financial statements, and the report writer rules (the guidance
+    # itself lives next to the template: src/templates/corp-income-guidance.md).
+    "financial_extraction": frozenset(),
+    # [BRD 16/10] VAT returns, CIC S10A/R20, customer business plan.
+    "vat_extraction": frozenset(),
+    "cic_extraction": frozenset(),
+    "plan_extraction": frozenset(),
+    # [BRD 27/10] mục 2: ngành TCB + đối tác đầu vào / đầu ra; the industry list is filled in.
+    "business_model_extraction": frozenset({"industry_list"}),
+    "report_writer": frozenset(),
+    "report_writer_user": frozenset(),
+    # [BRD 16/10] overall credit view written before the cells
+    "credit_assessment": frozenset(),
+    "credit_assessment_user": frozenset(),
+    "extraction_user": frozenset(),
+    # LLM tie-break for document classification.
+    "document_classification": frozenset({"document_type_catalogue"}),
+    "document_classification_user": frozenset(),
+}
+
+
+class PromptError(RuntimeError):
+    """A prompt file is missing, or its placeholders disagree with the code."""
+
+
+@lru_cache(maxsize=16)
+def prompt_text(name: str) -> str:
+    if name not in PROMPTS:
+        raise PromptError(f"prompt '{name}' is not declared in src/prompts.py")
+    path = PROMPT_DIR / f"{name}.md"
+    if not path.is_file():
+        raise PromptError(f"no prompt file at config/prompts/{name}.md")
+    text = path.read_text(encoding="utf-8")
+    if text.startswith("---"):
+        text = text.split("---", 2)[2]
+    found = set(_PLACEHOLDER.findall(text))
+    if found != PROMPTS[name]:
+        raise PromptError(f"config/prompts/{name}.md has placeholders {sorted(found)}, "
+                          f"the code fills {sorted(PROMPTS[name])}")
+    return text.strip() + "\n"
+
+
+def system_prompt(name: str, **values: str) -> str:
+    """The prompt with every {{placeholder}} filled; other braces are left as written."""
+
+    missing = PROMPTS.get(name, frozenset()) - set(values)
+    if missing or set(values) - PROMPTS.get(name, frozenset()):
+        raise PromptError(f"prompt '{name}' needs exactly {sorted(PROMPTS.get(name, ()))}, got {sorted(values)}")
+    return _PLACEHOLDER.sub(lambda m: str(values[m.group(1)]), prompt_text(name))
