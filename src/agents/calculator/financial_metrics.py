@@ -137,7 +137,7 @@ def merge_periods(records: list[dict[str, Any]]) -> dict[str, Any]:
         data = record["data"]
         # [BRD 29/10] "BCTC thuế hay kiểm toán" + the years — no file name
         record_years = sorted({_year_of(p) for p in data.get("periods") or [] if isinstance(p, dict) and _year_of(p)})
-        label = ("BCTC kiểm toán" if data.get("audited") else "BCTC thuế/tự lập") + (
+        label = ("BCTC kiểm toán" if data.get("audited") else "BCTC thuế") + (
             f" năm {', '.join(record_years)}" if record_years else "")
         if label not in sources:
             sources.append(label)
