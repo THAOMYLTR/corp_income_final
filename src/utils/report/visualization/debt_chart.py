@@ -2,7 +2,7 @@
 
 Input: the monthly balances OCR'd from CIC S10A, section 2.6 (cic_metrics → "monthly").
 One series, so one hue and no legend: the title names it. Bars per month, a dashed line at
-the 12-month average (the figure shown in the table), only the latest bar labelled.
+the 12-month average (the figure shown in the table). [05/11] In tỷ đồng, every bar labelled.
 Returned as a one-line <img> with the SVG inside (data URI), like the business-model diagram,
 so it shows in the PDF, HTML and .md. Edit the constants below to restyle it.
 """
@@ -14,14 +14,20 @@ import html
 import math
 
 WIDTH, HEIGHT = 380, 230
-PAD_LEFT, PAD_RIGHT, PAD_TOP, PAD_BOTTOM = 46, 12, 30, 34
+PAD_LEFT, PAD_RIGHT, PAD_TOP, PAD_BOTTOM = 40, 12, 44, 34   # [05/11] top: title + BQ legend
 BAR = "#4f6bb0"            # the one series colour
 INK, MUTED, GRID = "#1f1f3d", "#6b6b80", "#e3e3ea"
 FONT = "Arial, Helvetica, sans-serif"
+LABEL_SIZE = 7.5           # [05/11] bar value labels
 
 
 def _million(value: float) -> str:
     return f"{value / 1e6:,.0f}".replace(",", ".")
+
+
+def _billion(value: float) -> str:
+    """[05/11] Chart in tỷ đồng, one decimal: 43.500.000.000 → "43,5"; 1.234,5 for ≥ 1.000 tỷ."""
+    return f"{value / 1e9:,.1f}".replace(",", " ").replace(".", ",").replace(" ", ".")
 
 
 def _month_label(month: str) -> str:
@@ -39,11 +45,11 @@ def _nice_step(top: float, ticks: int = 4) -> float:
 
 
 def debt_chart(monthly: list[tuple[str, float]], average: float | None = None) -> str:
-    """'' when the CIC has no monthly balances."""
+    """'' when the CIC has no monthly balances. [05/11] Values in tỷ đồng; every bar has its value."""
 
     if not monthly:
         return ""
-    peak = max(max(v for _, v in monthly), average or 0) or 1.0
+    peak = max(max(v for _, v in monthly), average or 0) * 1.08 or 1.0      # room for the bar labels
     step_value = _nice_step(peak)
     top = step_value * math.ceil(peak / step_value)
     plot_w, plot_h = WIDTH - PAD_LEFT - PAD_RIGHT, HEIGHT - PAD_TOP - PAD_BOTTOM
@@ -54,21 +60,27 @@ def debt_chart(monthly: list[tuple[str, float]], average: float | None = None) -
              f'viewBox="0 0 {WIDTH} {HEIGHT}" font-family="{FONT}">',
              f'<rect width="100%" height="100%" fill="#ffffff"/>',
              f'<text x="{PAD_LEFT}" y="16" font-size="11" font-weight="bold" fill="{INK}">'
-             f'Diễn biến dư nợ tại các TCTD (triệu VNĐ) — T{html.escape(_month_label(monthly[-1][0]))}: '
-             f'{_million(monthly[-1][1])}</text>']
+             f'Diễn biến dư nợ tại các TCTD (tỷ đồng) — T{html.escape(_month_label(monthly[-1][0]))}: '
+             f'{_billion(monthly[-1][1])}</text>']
     for k in range(round(top / step_value) + 1):   # recessive grid + y labels
         value = step_value * k
         gy = y(value)
         parts.append(f'<line x1="{PAD_LEFT}" x2="{WIDTH - PAD_RIGHT}" y1="{gy:.1f}" y2="{gy:.1f}" '
                      f'stroke="{GRID}" stroke-width="1"/>')
         parts.append(f'<text x="{PAD_LEFT - 4}" y="{gy + 3:.1f}" text-anchor="end" font-size="9" '
-                     f'fill="{MUTED}">{_million(value)}</text>')
+                     f'fill="{MUTED}">{_billion(value).removesuffix(",0")}</text>')
+    labels: list[str] = []
     every = 1 if len(monthly) <= 8 else 2         # keep month labels from colliding
     for i, (month, value) in enumerate(monthly):
         x = PAD_LEFT + i * step + (step - bar_w) / 2
         parts.append(f'<rect x="{x:.1f}" y="{y(value):.1f}" width="{bar_w:.1f}" '
                      f'height="{PAD_TOP + plot_h - y(value):.1f}" rx="2" fill="{BAR}">'
-                     f'<title>{html.escape(month)}: {_million(value)}</title></rect>')
+                     f'<title>{html.escape(month)}: {_billion(value)} tỷ</title></rect>')
+        # [05/11] value of every month above its bar, in tỷ đồng — drawn last, with a white
+        # outline, so the dashed average line never cuts the digits
+        labels.append(f'<text x="{x + bar_w / 2:.1f}" y="{y(value) - 3:.1f}" text-anchor="middle" '
+                      f'font-size="{LABEL_SIZE}" fill="{INK}" stroke="#ffffff" stroke-width="2.5" '
+                      f'paint-order="stroke">{_billion(value)}</text>')
         if i % every == 0 or i == len(monthly) - 1:
             parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{HEIGHT - PAD_BOTTOM + 13}" text-anchor="middle" '
                          f'font-size="9" fill="{MUTED}">{html.escape(_month_label(month))}</text>')
@@ -76,11 +88,15 @@ def debt_chart(monthly: list[tuple[str, float]], average: float | None = None) -
         ay = y(average)
         parts.append(f'<line x1="{PAD_LEFT}" x2="{WIDTH - PAD_RIGHT}" y1="{ay:.1f}" y2="{ay:.1f}" '
                      f'stroke="{INK}" stroke-width="1" stroke-dasharray="4 3"/>')
-        parts.append(f'<text x="{PAD_LEFT + 4}" y="{ay - 4:.1f}" font-size="9" fill="{INK}">'
-                     f'BQ 12 tháng: {_million(average)}</text>')
+        # legend under the title instead of on the line (it covered the bar labels)
+        parts.append(f'<line x1="{PAD_LEFT}" x2="{PAD_LEFT + 18}" y1="30" y2="30" stroke="{INK}" '
+                     f'stroke-width="1" stroke-dasharray="4 3"/>')
+        parts.append(f'<text x="{PAD_LEFT + 22}" y="33" font-size="9" fill="{INK}">'
+                     f'Dư nợ BQ 12 tháng: {_billion(average)} tỷ đồng</text>')
+    parts += labels
     parts.append(f'<line x1="{PAD_LEFT}" x2="{WIDTH - PAD_RIGHT}" y1="{PAD_TOP + plot_h}" '
                  f'y2="{PAD_TOP + plot_h}" stroke="{MUTED}" stroke-width="1"/></svg>')
     svg = "".join(parts)
-    alt = html.escape("Dư nợ theo tháng: " + "; ".join(f"{m} {_million(v)}" for m, v in monthly))
+    alt = html.escape("Dư nợ theo tháng (tỷ đồng): " + "; ".join(f"{m} {_billion(v)}" for m, v in monthly))
     return (f'<img alt="{alt}" style="width:100%;max-width:{WIDTH}px" '
             f'src="data:image/svg+xml;base64,{base64.b64encode(svg.encode("utf-8")).decode("ascii")}">')
