@@ -75,16 +75,18 @@ table.layout > tbody > tr > td, table.layout > tr > td {{ border: none; padding:
 td.layout-main {{ width: 58%; }}
 td.layout-side {{ width: 42%; }}
 /* [05/11] Mục 3a, 3b: cùng 5 cột (Chỉ tiêu | năm N-2 | năm N-1 | % Tỷ trọng / Tăng/giảm | Nhận xét) */
-table.fin {{ table-layout: fixed; }}
+/* [05/11] Fixed-width tables: padding + border INSIDE each column width (border-box) and the
+   widths add up to 98%, so the PDF (WeasyPrint) never pushes the last column past the page edge. */
+table.fin, table.pakd {{ table-layout: fixed; }}
+table.fin th, table.fin td, table.pakd th, table.pakd td {{ box-sizing: border-box; }}
 table.fin th:nth-child(1) {{ width: 17%; }}
 table.fin th:nth-child(2), table.fin th:nth-child(3), table.fin th:nth-child(4) {{ width: 11%; }}
-table.fin th:nth-child(5) {{ width: 50%; }}
+table.fin th:nth-child(5) {{ width: 48%; }}
 /* [05/11] Mục 5a: hai bảng dự phóng có cùng 5 cột → cùng độ rộng từng cột, thẳng hàng nhau */
-table.pakd {{ table-layout: fixed; }}
 table.pakd th:nth-child(1) {{ width: 18%; }}
 table.pakd th:nth-child(2), table.pakd th:nth-child(3) {{ width: 16%; }}
 table.pakd th:nth-child(4) {{ width: 12%; }}
-table.pakd th:nth-child(5) {{ width: 38%; }}
+table.pakd th:nth-child(5) {{ width: 36%; }}
 
 /* Wide financial tables step down instead of overflowing the page box. */
 table.tbl-wide {{ font-size: 7.5pt; }}

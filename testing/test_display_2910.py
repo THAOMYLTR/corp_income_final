@@ -153,6 +153,24 @@ class Template0511Test(unittest.TestCase):
         self.assertIn("chưa phù hợp", fm.ros_vs_industry_remark(f, ros + 0.01))
 
 
+class Fix0511Test(unittest.TestCase):
+    def test_founding_counts_from_the_first_registration(self):
+        from src.utils.report.appendix_context import first_registration
+        records = [{"pass": "legal_basic", "document_type": "dieu_le", "data": {"establishment_date": "26/12/2025"}},
+                   {"pass": "legal_basic", "document_type": "gcn_dkdn", "data": {"establishment_date": "26/12/2022"}}]
+        self.assertEqual(f"{first_registration(records):%d/%m/%Y}", "26/12/2022")
+
+    def test_chart_labels_every_month_in_million_without_paint_order(self):
+        import base64, re
+        from src.utils.report.visualization.debt_chart import debt_chart
+        img = debt_chart([("09/2026", 105_300e6), ("10/2026", 96_215e6)], 64_273e6)
+        svg = base64.b64decode(re.search(r"base64,([A-Za-z0-9+/=]+)", img).group(1)).decode("utf-8")
+        self.assertIn(">105.300</text>", svg)
+        self.assertIn(">96.215</text>", svg)
+        self.assertIn("triệu đồng", svg)
+        self.assertNotIn("paint-order", svg)          # WeasyPrint ignores it → white text over the digits
+
+
 class TemplateTest(unittest.TestCase):
     def test_no_t24_row(self):
         with open("src/templates/corp-income-structure.md", encoding="utf-8") as handle:

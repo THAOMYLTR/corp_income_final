@@ -201,7 +201,7 @@ class CorpIncomeAnalysis:
             records, as_of,
             revenue_prev_year=(financials["years"].get(latest) or {}).get("net_revenue") if latest else None,
             business_type=btype)
-        corp = corp_group(items, financials, cic, as_of)
+        corp = corp_group(items, financials, cic, as_of, records)
         # [BRD 27/10] with a business plan and a TCB industry, the income is the projection.
         nganh = business_model.industry(records, financial_metrics.segment_code(financials))
         income = financial_metrics.income_estimate(

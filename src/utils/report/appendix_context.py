@@ -254,7 +254,24 @@ def business_type(records: list[dict]) -> tuple[str, str]:
 # --------------------------------------------------------------------------- #
 # corp group — mục 5 "Phân nhóm doanh nghiệp"
 # --------------------------------------------------------------------------- #
-def corp_group(items: dict, financials: dict, cic: dict, as_of: date) -> dict[str, Any]:
+def first_registration(records: list[dict], items: dict | None = None) -> date | None:
+    """[05/11] Ngày đăng ký lần đầu = ngày thành lập SỚM NHẤT mà các hồ sơ ghi.
+
+    Điều lệ / hồ sơ thay đổi có thể ghi ngày của lần sửa đổi (vd 26/12/2025) trong khi ĐKKD ghi
+    "đăng ký lần đầu 26/12/2022" — thời gian thành lập tính từ ngày đầu tiên.
+    """
+
+    dates = [parse_date(r["data"].get("establishment_date")) for r in records
+             if r.get("pass") == "legal_basic" and isinstance(r.get("data"), dict)]
+    dates = [d for d in dates if d]
+    if not dates and items is not None:
+        found = parse_date(_summary_value(items, "establishment_date"))
+        dates = [found] if found else []
+    return min(dates) if dates else None
+
+
+def corp_group(items: dict, financials: dict, cic: dict, as_of: date,
+               records: list[dict] | None = None) -> dict[str, Any]:
     """Bad corp if ANY criterion; Good corp if Good finance AND Good bureau; else Normal."""
 
     codes = _codes(items, 1)
@@ -262,7 +279,7 @@ def corp_group(items: dict, financials: dict, cic: dict, as_of: date) -> dict[st
     if "status_not_active" in codes:
         bad.append("Pháp lý: " + codes["status_not_active"]["message"])
     # [Guidance 05/11] lệch thông tin pháp lý giữa các nguồn chỉ là cảnh báo (mục 1b), không còn là Bad corp
-    founded = parse_date(_summary_value(items, "establishment_date"))
+    founded = first_registration(records or [], items)          # [05/11] ngày đăng ký lần đầu
     if founded and (as_of - founded).days < 365:
         bad.append(f"Pháp lý: thời gian thành lập dưới 12 tháng (thành lập {founded:%d/%m/%Y})")
     if "site_not_operating" in codes:
@@ -333,7 +350,7 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
 
     company, _ = _pick_by_document(records, "company_name")
     company = company or _summary_value(items, "company_name") or "Doanh nghiệp"
-    ctx["TenDoanhNghiep"] = legal_cell("company_name", "name_mismatch")
+    ctx["TenDoanhNghiep"] = legal_cell("company_name")          # [05/11] chỉ tên, cảnh báo ở 1b
     ctx["MST"] = legal_cell("tax_code", "tax_code_mismatch")
     ctx["NguoiDaiDien"] = legal_cell("legal_representatives", "rep_mismatch")
     t24, _ = _pick_by_document(records, "t24_id")
@@ -341,6 +358,9 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     founded_text, _ = _pick_by_document(records, "establishment_date")
     founded_text = founded_text or _summary_value(items, "establishment_date")
     founded = parse_date(founded_text)
+    first = first_registration(records, items)                  # [05/11] năm thành lập đầu tiên
+    if first and (not founded or first < founded):
+        founded, founded_text = first, f"{first:%d/%m/%Y}"
     number, _ = _pick_by_document(records, "registration_change_number")
     latest, _ = _pick_by_document(records, "latest_change_date")
     note = "; ".join(x for x in (
