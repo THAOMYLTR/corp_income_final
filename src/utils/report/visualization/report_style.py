@@ -14,11 +14,11 @@ _TABLE = re.compile(r"<table(?P<attrs>[^>]*)>(?P<body>.*?)</table>", re.DOTALL)
 _CELL = re.compile(r"<t[hd]\b")
 _ROW = re.compile(r"<tr\b.*?</tr>", re.DOTALL)
 
-# [Sửa 29/10] Report font: Helvetica, headings 11pt, body and tables 10pt. Change these to resize.
+# [05/11] Report font: Helvetica, headings 10pt, body and tables 9pt. Change these to resize.
 # The business-model diagram and debt chart keep their own size and font (they are images).
 FONT_FAMILY = 'Helvetica, Arial, "Liberation Sans", sans-serif'
-HEADING_PT = 11
-BODY_PT = 10
+HEADING_PT = 10       # [05/11] was 11
+BODY_PT = 9           # [05/11] was 10 — nội dung và bảng
 
 REPORT_CSS = f"""
 @page {{
