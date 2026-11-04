@@ -75,10 +75,9 @@ table.layout > tbody > tr > td, table.layout > tr > td {{ border: none; padding:
 td.layout-main {{ width: 58%; }}
 td.layout-side {{ width: 42%; }}
 /* [05/11] Mục 3a, 3b: cùng 5 cột (Chỉ tiêu | năm N-2 | năm N-1 | % Tỷ trọng / Tăng/giảm | Nhận xét) */
-/* [05/11] Fixed-width tables: padding + border INSIDE each column width (border-box) and the
-   widths add up to 98%, so the PDF (WeasyPrint) never pushes the last column past the page edge. */
-table.fin, table.pakd {{ table-layout: fixed; }}
-table.fin th, table.fin td, table.pakd th, table.pakd td {{ box-sizing: border-box; }}
+/* [05/11] Column widths as % on the normal (auto) table layout: the PDF engine (WeasyPrint) keeps
+   the table inside the page — "table-layout: fixed" made it add padding/borders on top of the %
+   and push the "Nhận xét" column past the page edge. Widths add up to 98%. */
 table.fin th:nth-child(1) {{ width: 17%; }}
 table.fin th:nth-child(2), table.fin th:nth-child(3), table.fin th:nth-child(4) {{ width: 11%; }}
 table.fin th:nth-child(5) {{ width: 48%; }}
