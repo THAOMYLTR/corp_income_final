@@ -74,6 +74,12 @@ table.layout {{ border: none; margin: 6px 0; }}
 table.layout > tbody > tr > td, table.layout > tr > td {{ border: none; padding: 0 6px 0 0; vertical-align: top; }}
 td.layout-main {{ width: 58%; }}
 td.layout-side {{ width: 42%; }}
+/* [05/11] Mục 5a: hai bảng dự phóng có cùng 5 cột → cùng độ rộng từng cột, thẳng hàng nhau */
+table.pakd {{ table-layout: fixed; }}
+table.pakd th:nth-child(1) {{ width: 18%; }}
+table.pakd th:nth-child(2), table.pakd th:nth-child(3) {{ width: 16%; }}
+table.pakd th:nth-child(4) {{ width: 12%; }}
+table.pakd th:nth-child(5) {{ width: 38%; }}
 
 /* Wide financial tables step down instead of overflowing the page box. */
 table.tbl-wide {{ font-size: 7.5pt; }}
