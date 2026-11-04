@@ -110,6 +110,10 @@ def build_llm(
         "max_tokens": int(os.getenv(max_tokens_env, "8192")),
         "api_key": key,
     }
+    # [05/11] every LLM reports its tokens to TOKEN_USAGE (notebook: tổng token / chi phí của lần chạy)
+    from src.utils.token_usage import TOKEN_USAGE
+
+    kwargs["callbacks"] = [TOKEN_USAGE]
     limiter = _rate_limiter()
     if limiter is not None:
         kwargs["rate_limiter"] = limiter
