@@ -340,19 +340,17 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     ctx: dict[str, str] = {}
 
     # ---- 1a. Thông tin cơ bản ----------------------------------------------------
-    def legal_cell(field: str, mismatch_code: str = "") -> str:
+    # [05/11] Bảng 1a chỉ ghi giá trị — chỗ không khớp giữa các nguồn đã nằm ở "Cảnh báo pháp lý" (1b).
+    def legal_cell(field: str) -> str:
         value, _ = _pick_by_document(records, field)
         value = value or _summary_value(items, field)
-        if not value:
-            return NO_INFO
-        mark = " ⚠ không khớp giữa các nguồn" if mismatch_code in codes else ""
-        return f"{value}{mark}"
+        return str(value) if value else NO_INFO
 
     company, _ = _pick_by_document(records, "company_name")
     company = company or _summary_value(items, "company_name") or "Doanh nghiệp"
-    ctx["TenDoanhNghiep"] = legal_cell("company_name")          # [05/11] chỉ tên, cảnh báo ở 1b
-    ctx["MST"] = legal_cell("tax_code", "tax_code_mismatch")
-    ctx["NguoiDaiDien"] = legal_cell("legal_representatives", "rep_mismatch")
+    ctx["TenDoanhNghiep"] = legal_cell("company_name")
+    ctx["MST"] = legal_cell("tax_code")
+    ctx["NguoiDaiDien"] = legal_cell("legal_representatives")
     t24, _ = _pick_by_document(records, "t24_id")
     ctx["T24ID"] = str(t24) if t24 else "Chưa có thông tin (tra cứu MST trên T24)"
     founded_text, _ = _pick_by_document(records, "establishment_date")
@@ -368,8 +366,7 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
         "thay đổi lần thứ " + " ".join(y for y in (str(number) if number not in (None, "") else "",
                                                    f"ngày {latest}" if latest else "") if y)
         if number not in (None, "") or latest else "") if x)
-    ctx["NamThanhLap"] = (f"{founded.year} ({note})" if founded else note or NO_INFO) + (
-        " ⚠ không khớp giữa các nguồn" if "establishment_mismatch" in codes else "")
+    ctx["NamThanhLap"] = f"{founded.year} ({note})" if founded else note or NO_INFO
     status = _summary_value(items, "operating_status")
     if not status:
         ctx["TinhTrangHoatDong"] = "Chưa có kết quả tra cứu (masothue.com / Cổng ĐKDN)"

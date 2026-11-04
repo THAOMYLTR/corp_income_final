@@ -202,7 +202,9 @@ class AppendixTemplateTest(CorpIncomeWorkflowTest):
     def test_legal_cells_come_from_the_documents(self):
         report = self.result["response"]
         # [BRD 16/10] ĐKKD first, and the mismatch with the tax lookup is marked
-        self.assertIn("| Mã số thuế | 0101234567 ⚠ không khớp giữa các nguồn |", report)
+        self.assertIn("| Mã số thuế | 0101234567 |", report)       # [05/11] no mark in 1a
+        self.assertNotIn("không khớp giữa các nguồn |", report)
+        self.assertIn("MST không khớp tuyệt đối", report)               # the warning stays in 1b
         self.assertIn("| Năm thành lập | 2015 (Đăng ký lần đầu 12/05/2015; thay đổi lần thứ 6 ngày 20/03/2026) |",
                       report)
         # [BRD 29/10] 1b: tên | tỷ lệ | chức vụ | quan hệ | ảnh hưởng | năng lực (last three: site report)
