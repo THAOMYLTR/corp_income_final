@@ -522,16 +522,19 @@ def debt_table(cic: dict[str, Any]) -> str:
                                      escape=False) + "</tr>")
     body.append("<tr>" + _html_cells(["%"] + [fm.pct(l["total"] / grand) if grand else "—" for l in lenders]
                                      + ["100%" if grand else "—"]) + "</tr>")
-    body.append("<tr>" + _html_cells(["Trung bình dư nợ 12 tháng gần nhất"] + [""] * len(lenders)
-                                     + [fm.fmt(cic.get("avg_balance_12m"))]) + "</tr>")
+    # [05/11] Trung bình dư nợ 12 tháng, cam kết ngoại bảng, TSBĐ: chỉ số tổng — ô tên chỉ tiêu
+    # gộp (colspan) qua các cột ngân hàng để hiện đủ tên.
+    def total_row(label: str, total: str) -> str:
+        return (f'<tr><td colspan="{1 + len(lenders)}">{html.escape(label)}</td>'
+                f"<td>{html.escape(total)}</td></tr>")
+
+    body.append(total_row("Trung bình dư nợ 12 tháng gần nhất", fm.fmt(cic.get("avg_balance_12m"))))
     with_commitment = [l["name"] for l in lenders if l["off_balance"]]
     if with_commitment:                               # [Template 05/11] no commitment → no row
-        body.append(money_row("Cam kết ngoại bảng" + (f" tại: {', '.join(with_commitment)}" if with_commitment else "")
-                          + " (*)", "off_balance"))
-    collateral = [fm.fmt(l["collateral_value"]) if cic.get("has_r20") else "—" for l in lenders]
-    body.append("<tr>" + _html_cells(["Tổng giá trị TSBĐ theo CIC (**)"] + collateral
-                                     + [fm.fmt(cic["rows"]["Total"]["collateral"]) if cic.get("has_r20") else "—"])
-                + "</tr>")
+        body.append(total_row(f"Cam kết ngoại bảng tại: {', '.join(with_commitment)} (*)",
+                              fm.fmt(sum(l["off_balance"] for l in lenders))))
+    body.append(total_row("Tổng giá trị TSBĐ theo CIC (**)",
+                          fm.fmt(cic["rows"]["Total"]["collateral"]) if cic.get("has_r20") else "—"))
     # [Sửa 29/10] footnote + ONE line on whether the CIC used is valid (no repeated CIC warnings)
     validity = cic.get("validity") or ""
     notes = [("(*) Không cộng vào Tổng dư nợ. " if with_commitment else "") + "(**) Theo bản tin R20."]
