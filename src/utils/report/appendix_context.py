@@ -445,7 +445,7 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     rows = []
     for i, (label, field) in enumerate(lines):
         v2, v1 = fm.asset_value(f2, field), fm.asset_value(f1, field)
-        cells = [label, fm.fmt(v2), share(f2, v2), fm.fmt(v1), share(f1, v1)]
+        cells = [label, fm.fmt(v2), fm.fmt(v1), share(f1, v1)]      # [05/11] one "% Tỷ trọng": năm N-1
         rows.append(_html_cells(cells) + (_html_cell(_html_lines(remarks), rowspan=len(lines)) if i == 0 else ""))
     ctx["RowsCoCau"] = "\n".join(f"<tr>{r}</tr>" for r in rows)
 

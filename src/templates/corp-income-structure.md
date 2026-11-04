@@ -71,14 +71,14 @@ Who fills what:
 
 #### a. Cơ cấu tài sản, nguồn vốn
 
-<table>
-<tr><th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>% Tỷ trọng</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th><th>Nhận xét</th></tr>
+<table class="fin">
+<tr><th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th><th>Nhận xét</th></tr>
 {{RowsCoCau}}
 </table>
 
 #### b. Quy mô & tăng trưởng & chỉ số
 
-<table>
+<table class="fin">
 <tr><th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>{{Nam-1}}</th><th>Tăng/giảm</th><th>Nhận xét</th></tr>
 {{RowsTangTruong}}
 </table>

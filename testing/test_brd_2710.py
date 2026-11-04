@@ -410,7 +410,7 @@ class TemplateTest(unittest.TestCase):
                      "#### a. Ngành nghề hoạt động kinh doanh", "#### b. Mô tả hoạt động kinh doanh",
                      "| Mô hình hoạt động kinh doanh | {{MoHinhHDKD}} |",
                      "#### a. Cơ cấu tài sản, nguồn vốn",
-                     "<th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>% Tỷ trọng</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th>"
+                     "<th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th>"
                      "<th>Nhận xét</th>",
                      "#### b. Quy mô & tăng trưởng & chỉ số", "<th>Tăng/giảm</th>",
                      "{{BangDuNoTCTD}}", "{{BieuDoDuNo}}", "#### b. Chất lượng tín dụng",
