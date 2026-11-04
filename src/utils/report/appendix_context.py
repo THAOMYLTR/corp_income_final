@@ -459,11 +459,13 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     remarks = [x for x in (fm.industry_fit_remark(financials, allocation), fm.current_ratio_remark(financials)) if x]
     remarks += [f"⚠ {w}" for w in financials["bs_warnings"]]
     remarks = remarks or ["Chưa có bảng cân đối kế toán để đánh giá"]
-    rows = []
-    for i, (label, field) in enumerate(lines):
-        v2, v1 = fm.asset_value(f2, field), fm.asset_value(f1, field)
-        cells = [label, fm.fmt(v2), fm.fmt(v1), share(f1, v1)]      # [05/11] one "% Tỷ trọng": năm N-1
-        rows.append(_html_cells(cells) + (_html_cell(_html_lines(remarks), rowspan=len(lines)) if i == 0 else ""))
+    # [05/11] last row: hệ số thanh toán hiện hành của từng năm (no "% Tỷ trọng")
+    ratio = lambda year: _ratio_text("current_ratio", (financials["ratios"].get(year) or {}).get("current_ratio"))
+    cell_rows = [[label, fm.fmt(fm.asset_value(f2, field)), fm.fmt(fm.asset_value(f1, field)),
+                  share(f1, fm.asset_value(f1, field))] for label, field in lines]   # one "% Tỷ trọng": năm N-1
+    cell_rows.append(["Hệ số TT hiện hành", ratio(n2), ratio(n1), ""])
+    rows = [_html_cells(cells) + (_html_cell(_html_lines(remarks), rowspan=len(cell_rows)) if i == 0 else "")
+            for i, cells in enumerate(cell_rows)]
     ctx["RowsCoCau"] = "\n".join(f"<tr>{r}</tr>" for r in rows)
 
     # b. Quy mô & tăng trưởng & chỉ số — "Tăng/giảm" = năm sau / năm trước − 1, signed
