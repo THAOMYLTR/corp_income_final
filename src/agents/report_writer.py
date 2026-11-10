@@ -25,6 +25,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.llm_errors import explain_llm_error
 from src.prompts import system_prompt
 from src.utils.paths import PROJECT_ROOT
+from src.utils.rate_limit import call_llm
 
 NO_INFO = "Chưa có thông tin trong hồ sơ"
 MAX_EVIDENCE_CHARS = 120_000
@@ -117,7 +118,7 @@ def assess_credit(llm: Any, evidence: dict[str, Any], corp_group: str) -> tuple[
     if llm is None:
         return {}, ""
     try:
-        answer = build_assessment_chain(llm).invoke({"evidence": fit_payload(evidence)})
+        answer = call_llm(lambda: build_assessment_chain(llm).invoke({"evidence": fit_payload(evidence)}))
     except Exception as exc:  # noqa: BLE001
         return {}, f"Credit assessment failed: {explain_llm_error(exc)}"
     if not isinstance(answer, dict) or not answer:
@@ -177,9 +178,9 @@ def write_placeholders(
         return fallback, "No report_writer_llm configured — narrative cells left as 'Chưa có thông tin'."
     payload = fit_payload(evidence)
     try:
-        answer = build_writer_chain(llm).invoke(
+        answer = call_llm(lambda: build_writer_chain(llm).invoke(
             {"fields": describe_fields(template, names), "evidence": payload}
-        )
+        ))
     except Exception as exc:  # noqa: BLE001 — reported, never raised
         return fallback, f"Report writer failed: {explain_llm_error(exc)}"
     if not isinstance(answer, dict):

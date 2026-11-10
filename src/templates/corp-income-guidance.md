@@ -220,7 +220,7 @@ x Tỷ lệ góp vốn
 - Cảnh báo dấu hiệu bất thường BCTC: công ty kiểm toán thuộc danh sách loại trừ; Tổng TS ≠ Tổng NV; số liệu cuối kỳ năm trước ≠ đầu kỳ năm sau; chênh lệch LN chưa phân phối giữa hai kỳ > LNST trong kỳ; DTT trên BCTC khác biệt lớn so với tờ khai VAT / sao kê / phần mềm bán hàng cùng kỳ; chi phí lãi vay không tương quan với dư nợ BQ CIC × 10%/năm; thuế TNDN / LNTT ≠ 20% (trừ ngành / địa bàn ưu đãi).
 - Trạng thái tài chính: phân khúc theo doanh thu năm gần nhất (LC (Large Corp) ≥ 2000 tỷ; MM ≥ 600 tỷ; USME ≥ 200 tỷ; SME >= 80 tỷ, MSME < 80 tỷ); DT giảm > 20% → HĐKD suy giảm; (thu nhập khác + DT tài chính) / LNTT > 20%; chi phí lãi vay / LN gộp > 50%; ROS < 0; hệ số thanh toán hiện hành < 1.
 - Phân nhóm (chỉ hiển thị khi POC): Bad finance — BCTC mâu thuẫn trọng yếu nếu vi phạm vào một trong các yếu tố):
-     a. Với BCTC kiểm toán, công ty kiểm toán thuộc danh sách loại trừ (CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN - MST 0102662764)
+     a. Với BCTC kiểm toán, công ty kiểm toán thuộc danh sách loại trừ (CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN - MST 0102662764) và Công ty TNHH Kiểm toán iGlobal - MST 0312075184
      b. Tổng tài sản <> Tổng nguồn vốn; 
      c. Số liệu cuối kỳ của năm trước <> số liệu đầu kỳ của năm tiếp theo (trừ một số trường hợp đặc biệt: thay đổi năm tài chính, thay đổi chế độ kế toán hoặc tổ chức lại doanh nghiệp).
      d. Chênh lệch lợi nhuận chưa phân phối giữa kỳ này và kỳ trước vượt quá lợi nhuận sau thuế phát sinh trong kỳ, trừ khi có điều chỉnh hồi tố hoặc phân phối lại lợi nhuận; 
@@ -248,6 +248,7 @@ Normal — còn lại.
   - LNST hợp lý = LNST năm N-1 − doanh thu tài chính năm N-1 − thu nhập khác năm N-1.
   - LNST sử dụng để trả nghĩa vụ TDH = nghĩa vụ trả gốc TDH hằng năm − khấu hao trong năm.
   - Lợi tức / cổ tức tối đa chia được cho KHCN = (LNST hợp lý − LNST sử dụng để trả nghĩa vụ TDH) × tỷ lệ góp vốn.
+  - Trường hợp không xác định được nghĩa vụ trả gốc TDH hằng năm hoặc khấu hao trong năm thì kết quả của LNST sử dụng để trả nghĩa vụ TDH sẽ bằng 0.
 
 ---
 

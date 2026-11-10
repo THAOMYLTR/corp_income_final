@@ -281,8 +281,9 @@ class ProjectionTest(unittest.TestCase):
         self.assertTrue(any("không ghi cơ sở" in w for w in r["warnings"]))
 
     def test_dividend_formula(self):
+        # [Guidance 10/11] no khấu hao in this BCTC → LNST trả nghĩa vụ TDH = 0
         r = fm.income_estimate(self.financials(), 60, 20 * M)
-        self.assertAlmostEqual(r["value"], (50 * M - 20 * M) * 0.6)
+        self.assertAlmostEqual(r["value"], 50 * M * 0.6)
 
 
 class PlanTableTest(unittest.TestCase):

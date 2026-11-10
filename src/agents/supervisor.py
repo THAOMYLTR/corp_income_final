@@ -95,6 +95,7 @@ from src.agents.extraction.business_model_extraction import (
     extract_business_model_structured_data,
 )
 from src.agents.specialist import SPECIALIST_BY_AGENT
+from src.utils.rate_limit import call_llm
 
 DEFAULT_ROUTE: AgentName = "CORP_INCOME_AGENT"
 DEFAULT_WORKFLOW_MODE: WorkflowMode = "single_corp_income"
@@ -787,7 +788,7 @@ class Supervisor:
         chain = self._classifier_chain_for(group_id)
         if chain:
             try:
-                result = chain.invoke(
+                result = call_llm(lambda: chain.invoke(       # [10/11] paced, 429 retried
                     {
                         "filename": filename,
                         "content_sample": (
@@ -795,7 +796,7 @@ class Supervisor:
                             or "No text extracted from the document."
                         ),
                     }
-                )
+                ))
                 document_type = result.get("document_type") or ""
                 if document_type and get_type(document_type) is None:
                     return rule

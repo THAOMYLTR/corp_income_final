@@ -259,11 +259,28 @@ def vat_summary(records: list[dict[str, Any]], as_of: date, years: dict[str, Any
             "current_year": current, "text": text, "coverage": coverage, "monthly_growth": monthly_growth}
 
 
+# [10/11] words dropped before comparing auditor names ("Cty TNHH Kiểm toán iGlobal" = "CÔNG TY
+# TNHH KIỂM TOÁN IGLOBAL"); the MSTs of the list also match an auditor written with its tax code.
+COMPANY_FORM_WORDS = {"cong", "ty", "cty", "ct", "tnhh", "mtv", "co", "phan", "cp", "ctcp"}
+EXCLUDED_AUDITOR_TAX_CODES = ("0102662764", "0312075184")      # Bình An, iGlobal
+
+
+def _auditor_core(name: str) -> str:
+    return " ".join(w for w in normalize_text(name).split() if w not in COMPANY_FORM_WORDS)
+
+
 def _excluded_auditors() -> list[str]:
     if not EXCLUDED_AUDITORS_FILE.is_file():
         return []
-    return [normalize_text(line) for line in EXCLUDED_AUDITORS_FILE.read_text(encoding="utf-8").splitlines()
+    return [_auditor_core(line) for line in EXCLUDED_AUDITORS_FILE.read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.startswith("#")]
+
+
+def _is_excluded_auditor(auditor: str, excluded: list[str]) -> bool:
+    core = f" {_auditor_core(auditor)} "
+    digits = "".join(ch for ch in auditor if ch.isdigit())
+    return any(name and f" {name} " in core for name in excluded) or \
+        any(code in digits for code in EXCLUDED_AUDITOR_TAX_CODES)
 
 
 # --------------------------------------------------------------------------- #
@@ -304,7 +321,7 @@ def compute(records: list[dict[str, Any]], as_of: date | None = None) -> dict[st
     bs_texts: list[str] = []       # [BRD 29/10] warnings of the balance sheet → table "a. Cơ cấu tài sản"
     excluded = _excluded_auditors()
     for auditor in merged["auditors"]:
-        if any(name and name in normalize_text(auditor) for name in excluded):
+        if _is_excluded_auditor(auditor, excluded):
             material.append(f"Công ty kiểm toán thuộc danh sách loại trừ: {auditor}")
             bs_texts.append(material[-1])
     if merged["auditors"] and not excluded:
@@ -534,20 +551,24 @@ def industry_fit_remark(financials: dict[str, Any], allocation: dict[str, Any] |
 
 
 def earnings_quality_remark(financials: dict[str, Any]) -> str:
-    """[Template 05/11] Chất lượng lợi nhuận = LN gộp về bán hàng và cung cấp dịch vụ / LNTT (năm gần nhất)."""
+    """[Template 10/11] Chất lượng lợi nhuận = (Lợi nhuận khác + Doanh thu hoạt động tài chính) / LNTT.
+
+    < 25% tốt (cốt lõi); 25% – < 50% trung bình; ≥ 50% kém. Kết quả < 0 (hoặc không tính được) →
+    không nhận xét ('').
+    """
 
     year = financials.get("latest_year")
     fig = (financials["years"].get(year) or {}) if year else {}
-    gross, lntt = fig.get("gross_profit"), fig.get("profit_before_tax")
-    if gross is None or lntt is None:
+    other_profit, fin_income, lntt = fig.get("other_profit"), fig.get("financial_income"), fig.get("profit_before_tax")
+    if not lntt or (other_profit is None and fin_income is None):
         return ""
-    if lntt <= 0:
-        return f"Chất lượng lợi nhuận năm {year}: không đánh giá được (LNTT ≤ 0)"
-    ratio = gross / lntt
-    text = f"Chất lượng lợi nhuận năm {year} (LN gộp / LNTT) = {pct(ratio)} — "
-    if ratio > 0.85:
+    ratio = ((other_profit or 0) + (fin_income or 0)) / lntt
+    if ratio < 0:
+        return ""
+    text = (f"Chất lượng lợi nhuận năm {year} ((LN khác + DT hoạt động tài chính) / LNTT) = {pct(ratio)} — ")
+    if ratio < 0.25:
         return text + "Chất lượng lợi nhuận tốt đến từ hoạt động kinh doanh cốt lõi"
-    if ratio >= 0.50:
+    if ratio < 0.50:
         return text + "Chất lượng lợi nhuận trung bình, một phần lợi nhuận không đến từ hoạt động kinh doanh cốt lõi"
     return text + "Chất lượng lợi nhuận kém, lợi nhuận không đến từ hoạt động kinh doanh cốt lõi"
 
@@ -634,9 +655,9 @@ def income_estimate(financials: dict[str, Any], ownership_pct: float | None,
     if other_income is None:
         missing.append("thu nhập khác (tính = 0)")
     if dep is None:
-        missing.append("khấu hao (tính = 0)")
+        missing.append("khấu hao (LNST trả nghĩa vụ TDH tính = 0)")
     if annual_lt_principal is None:
-        missing.append("nghĩa vụ trả gốc TDH hằng năm của DN (tính = 0)")
+        missing.append("nghĩa vụ trả gốc TDH hằng năm của DN (LNST trả nghĩa vụ TDH tính = 0)")
     historical = None if lnst is None else lnst - (fin_income or 0) - (other_income or 0)
 
     # [DP] projection from the business plan
@@ -672,7 +693,9 @@ def income_estimate(financials: dict[str, Any], ownership_pct: float | None,
                 "feasible_ros": feasible_ros, "lnst": feasible_ros * feasible_rev,
             }
     reasonable = projection["lnst"] if projection else historical
-    lt_use = max(0.0, (annual_lt_principal or 0) - (dep or 0))
+    # [Guidance 10/11] không xác định được nghĩa vụ trả gốc TDH hằng năm HOẶC khấu hao trong năm
+    # → LNST sử dụng để trả nghĩa vụ TDH = 0
+    lt_use = 0.0 if annual_lt_principal is None or dep is None else max(0.0, annual_lt_principal - dep)
     value = None
     if reasonable is not None and ownership_pct is not None:
         value = (reasonable - lt_use) * ownership_pct / 100

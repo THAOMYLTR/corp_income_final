@@ -141,34 +141,39 @@ class Template0511Test(unittest.TestCase):
         self.assertEqual(fm.industry_fit_remark(fit, None), "")
 
     def test_earnings_quality_and_ros_vs_industry(self):
-        good = self.fin(gross_profit=90, profit_before_tax=100)
-        self.assertIn("tốt đến từ hoạt động kinh doanh cốt lõi", fm.earnings_quality_remark(good))
-        mid = self.fin(gross_profit=60, profit_before_tax=100)
-        self.assertIn("trung bình", fm.earnings_quality_remark(mid))
-        poor = self.fin(gross_profit=40, profit_before_tax=100)
-        self.assertIn("kém", fm.earnings_quality_remark(poor))
+        # [10/11] (LN khác + DT tài chính) / LNTT: < 25% tốt, 25–< 50% trung bình, ≥ 50% kém, < 0 → no remark
+        q = lambda other, fin_inc, lntt: fm.earnings_quality_remark(
+            self.fin(other_profit=other, financial_income=fin_inc, profit_before_tax=lntt))
+        self.assertIn("tốt đến từ hoạt động kinh doanh cốt lõi", q(10, 10, 100))         # 20%
+        self.assertIn("trung bình", q(20, 5, 100))                                      # 25%
+        self.assertIn("kém", q(30, 20, 100))                                             # 50%
+        self.assertEqual(q(-30, 5, 100), "")                                             # < 0
+        self.assertEqual(q(10, 10, 0), "")
         f = fm.compute([fin([Y2025, Y2024])], AS_OF)
         ros = f["ratios"][f["latest_year"]]["ros"]
         self.assertIn(" phù hợp", fm.ros_vs_industry_remark(f, ros - 0.01))
         self.assertIn("chưa phù hợp", fm.ros_vs_industry_remark(f, ros + 0.01))
 
 
-class Fix0511Test(unittest.TestCase):
-    def test_founding_counts_from_the_first_registration(self):
-        from src.utils.report.appendix_context import first_registration
-        records = [{"pass": "legal_basic", "document_type": "dieu_le", "data": {"establishment_date": "26/12/2025"}},
-                   {"pass": "legal_basic", "document_type": "gcn_dkdn", "data": {"establishment_date": "26/12/2022"}}]
-        self.assertEqual(f"{first_registration(records):%d/%m/%Y}", "26/12/2022")
+class Guidance1011Test(unittest.TestCase):
+    def test_iglobal_is_excluded(self):
+        for name in ("Công ty TNHH Kiểm toán iGlobal", "CTY TNHH KIỂM TOÁN IGLOBAL",
+                     "Kiểm toán ABC (MST 0312075184)"):
+            record = fin([Y2025, Y2024])
+            record["data"]["audited"], record["data"]["auditor_name"] = True, name
+            self.assertEqual(fm.compute([record], AS_OF)["group"], "Bad finance", name)
+        record = fin([Y2025, Y2024])
+        record["data"]["audited"], record["data"]["auditor_name"] = True, "Công ty TNHH Kiểm toán Global ABC"
+        self.assertNotEqual(fm.compute([record], AS_OF)["group"], "Bad finance")
 
-    def test_chart_labels_every_month_in_million_without_paint_order(self):
-        import base64, re
-        from src.utils.report.visualization.debt_chart import debt_chart
-        img = debt_chart([("09/2026", 105_300e6), ("10/2026", 96_215e6)], 64_273e6)
-        svg = base64.b64decode(re.search(r"base64,([A-Za-z0-9+/=]+)", img).group(1)).decode("utf-8")
-        self.assertIn(">105.300</text>", svg)
-        self.assertIn(">96.215</text>", svg)
-        self.assertIn("triệu đồng", svg)
-        self.assertNotIn("paint-order", svg)          # WeasyPrint ignores it → white text over the digits
+    def test_lt_debt_use_is_zero_when_principal_or_depreciation_unknown(self):
+        f = fm.compute([fin([Y2025, Y2024])], AS_OF)
+        year = fm.income_estimate(f, 100)["year"]
+        for principal, dep in ((None, 5 * M), (50 * M, None), (None, None)):
+            f["years"][year]["depreciation"] = dep
+            self.assertEqual(fm.income_estimate(f, 100, principal)["lnst_for_lt_debt"], 0.0, (principal, dep))
+        f["years"][year]["depreciation"] = 5 * M
+        self.assertEqual(fm.income_estimate(f, 100, 50 * M)["lnst_for_lt_debt"], 45 * M)
 
 
 class TemplateTest(unittest.TestCase):

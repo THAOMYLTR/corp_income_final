@@ -9,6 +9,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from src.llm_errors import explain_llm_error
 from src.prompts import system_prompt as prompt_file
 from src.utils.common import normalize_text
+from src.utils.rate_limit import call_llm
 
 
 TRIEU_VND = 10 ** 6
@@ -125,7 +126,8 @@ def run_extraction(
     if chain is None:
         return None, missing_llm_message
     try:
-        result = chain.invoke({"filename": filename, "content": content})
+        # [10/11] paced; a 429 waits and retries instead of losing this document
+        result = call_llm(lambda: chain.invoke({"filename": filename, "content": content}))
     except Exception as exc:
         return None, _explain(exc)
 

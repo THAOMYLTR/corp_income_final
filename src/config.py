@@ -50,26 +50,6 @@ def llm_provider() -> str:
     return provider
 
 
-def _rate_limiter():
-    """One limiter shared by every client, from LLM_REQUESTS_PER_MINUTE (0 = off)."""
-
-    per_minute = float(os.getenv("LLM_REQUESTS_PER_MINUTE", "0") or 0)
-    if per_minute <= 0:
-        return None
-    global _SHARED_LIMITER
-    try:
-        return _SHARED_LIMITER
-    except NameError:
-        from langchain_core.rate_limiters import InMemoryRateLimiter
-
-        _SHARED_LIMITER = InMemoryRateLimiter(
-            requests_per_second=per_minute / 60.0,
-            check_every_n_seconds=0.1,
-            max_bucket_size=1,
-        )
-        return _SHARED_LIMITER
-
-
 def build_llm(
     model_env: str,
     temperature: float = 0.1,
@@ -110,9 +90,7 @@ def build_llm(
         "max_tokens": int(os.getenv(max_tokens_env, "8192")),
         "api_key": key,
     }
-    limiter = _rate_limiter()
-    if limiter is not None:
-        kwargs["rate_limiter"] = limiter
+    # [10/11] pacing / 429 retries: src/utils/rate_limit.call_llm (LLM_REQUESTS_PER_MINUTE)
 
     if provider == "anthropic":
         from langchain_anthropic import ChatAnthropic

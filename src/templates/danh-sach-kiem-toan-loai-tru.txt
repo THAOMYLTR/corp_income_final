@@ -1,3 +1,4 @@
 # [Guidance 05/11] Công ty kiểm toán thuộc danh sách loại trừ (Bad finance tiêu chí a). Mỗi dòng một tên.
-# Dòng bắt đầu bằng # là ghi chú. MST 0102662764.
+# Dòng bắt đầu bằng # là ghi chú. Bình An: MST 0102662764 · iGlobal: MST 0312075184 (thêm 10/11).
 CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN
+CÔNG TY TNHH KIỂM TOÁN IGLOBAL
