@@ -1,6 +1,6 @@
 # Hướng dẫn xếp hồ sơ vào các thư mục (theo Document Matrix 27/10/2026)
 
-Mỗi hồ sơ là một thư mục (`INPUT_PATHS`), bên trong có 7 thư mục con — mỗi thư mục là một phần
+Mỗi hồ sơ là một thư mục (tên thư mục = case id trong `TESTCASE_IDS`, nằm trong `CASES_DIR`), bên trong có 7 thư mục con — mỗi thư mục là một phần
 của Document Matrix. Agent CIA (Corp Income Agent) đọc các thư mục này. Danh sách loại giấy tờ
 đầy đủ, mã ma trận, agent sử dụng và từ khóa nhận diện nằm ở
 [`src/agents/documents/document_matrix.yaml`](../src/agents/documents/document_matrix.yaml) —

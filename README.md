@@ -220,24 +220,26 @@ sets their own LLM. An unset model or key raises at start-up, naming the variabl
 
 ## Running it
 
-1. Put the dossier in `samples/<testcase>/` with one sub-folder per matrix section (table above).
-2. Open the notebook. **Cell 4** — inputs:
+1. Put each dossier in `samples/<case_id>/` with one sub-folder per matrix section (table above).
+2. Open the notebook. **Cell 3** — inputs ([12/11] many cases in one run):
    ```python
-   TESTCASE_ID = "case_1"
+   CASES_DIR = PROJECT_ROOT / "samples"  # folder holding the case folders (or a /Volumes/... path)
+   TESTCASE_IDS = ["case_1", "case_2"]  # case folder names; one case = ["case_1"]
+   PER_CASE = {}                        # per-case overrides, e.g. {"case_2": {"input_paths": [...]}}
    LOAN_PROGRAM = "KHDN"
    AGENT = "CORP_INCOME_AGENT"          # CIA
-   INPUT_PATHS = [str(PROJECT_ROOT / "samples" / TESTCASE_ID)]
    LOAN_DATE = "27/10/2026"             # 12-month / 1-month checks end here; None = today
    BORROWER_NAMES = []                  # [] = found in ho_so_vay_von; fill in to override
    ANNUAL_LT_PRINCIPAL = None           # nghĩa vụ trả gốc TDH hằng năm của DN (đồng), if known
    ```
-3. Run the cells in order: config → imports → `supervisor.process(...)` → save.
+3. Run the cells in order: parameters → config → model check → imports → **Run** (`run_cases`: cases one after
+   another, one summary row each). The last cell shows one case's report.
 
 ---
 
 ## Outputs
 
-Written to `logs/<testcase>_<timestamp>/`:
+Written to `logs/<case_id>_<timestamp>/` (report: `final_response_<case_id>.pdf / .md`), plus `logs/batch_<timestamp>.json`:
 
 | File | Content |
 |---|---|

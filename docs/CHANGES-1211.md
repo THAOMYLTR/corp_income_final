@@ -22,10 +22,10 @@
 | Mục | Thay đổi | File |
 |---|---|---|
 | `run_cases` | Chạy lần lượt các case trong `TESTCASE_IDS`, lưu mỗi case như cell lưu kết quả; case lỗi không dừng cả lô. Bảng tổng hợp: status (OK / THIẾU TRÍCH XUẤT / LỖI), số file, số lượt trích xuất thất bại + chi tiết, nhóm DN, thư mục, số phút; lưu `logs/batch_<giờ>.json`. | `src/utils/batch.py` (mới) |
-| Tên file báo cáo | `final_response_<case_id>.pdf / .md` — cả chạy 1 case (cell lưu kết quả) và nhiều case. | `src/utils/batch.py`, `local_underwriting_agents.ipynb` |
-| Notebook | Cell thông số: thêm `TESTCASE_IDS`, `PER_CASE`. Cell cuối "Chạy nhiều case": chỉ gọi `run_cases` và hiện bảng tổng hợp. | `local_underwriting_agents.ipynb` |
+| Tên file báo cáo | `final_response_<case_id>.pdf / .md`. | `src/utils/batch.py` |
+| Notebook — chỉ còn chạy nhiều case | Cell 3: `CASES_DIR` (thư mục chứa các case), `TESTCASE_IDS`, `PER_CASE`; bỏ `TESTCASE_ID`, `INPUT_PATHS`. Bỏ cell Run 1 case và cell lưu kết quả 1 case (việc lưu nằm trong `batch.save_run`). Cell "Run" gọi `run_cases`, hiện bảng tổng hợp. Cell cuối (tuỳ chọn): xem báo cáo, lượt trích xuất thất bại, kết luận từng mục của một case. | `local_underwriting_agents.ipynb` |
 
-Cách chạy nhiều case: cell 1–8 → bỏ qua cell Run và cell lưu kết quả của 1 case → cell cuối.
+Cách chạy: cell 1 → 8 (thông số, config, kiểm tra model, import) → cell Run → (tuỳ chọn) cell xem một case.
 
 ## Giữ nguyên theo các quyết định trước (Template final ghi khác — chờ xác nhận)
 - Chất lượng lợi nhuận = (LN khác + DT TC) / LNTT, ngưỡng 25% / 50% (10/11).

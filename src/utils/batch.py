@@ -1,9 +1,9 @@
 """[12/11] Chạy nhiều case một lần, lần lượt từng case, mỗi case một thư mục kết quả.
 
-Notebook (cell "Chạy nhiều case"):
+Notebook (cell "Run" — the notebook only runs this way since 12/11):
 
     from src.utils.batch import run_cases
-    summary = run_cases(supervisor, ["case_1", "case_2", "case_3"], samples_dir=PROJECT_ROOT / "samples",
+    summary = run_cases(supervisor, ["case_1", "case_2", "case_3"], samples_dir=CASES_DIR,
                         output_dir=OUTPUT_DIR, agent=AGENT, loan_program=LOAN_PROGRAM)
 
 - Cases run ONE AFTER ANOTHER (not at the same time): each case already reads its files and calls
@@ -12,7 +12,7 @@ Notebook (cell "Chạy nhiều case"):
 - One case failing does not stop the others: the error is written to its row of the summary.
 - ``per_case`` = {case_id: {...}} overrides the shared settings for one case, e.g.
   {"case_3": {"borrower_names": ["Nguyễn Văn A"], "annual_lt_principal": 5e9}}.
-- ``save_run`` writes the same files as the single-case cell (final_response_<case_id>.md / .pdf,
+- ``save_run`` writes every output file of one case (final_response_<case_id>.md / .pdf,
   corp_income.json / .xlsx, *_extraction.json, ocr/, result.json).
 """
 
@@ -79,7 +79,7 @@ def save_run(result: dict[str, Any], run_dir: Path, case_id: str = "") -> Path:
 
 def failed_extractions(result: dict[str, Any]) -> list[str]:
     """[12/11] "file (lượt): lý do" for every extraction pass that should have run and gave nothing —
-    same check as the WARNING of the single-case cell (a 429 that outlasted the retries lands here)."""
+    a 429 that outlasted the retries lands here."""
 
     from src.agents.supervisor import EXTRACTION_PASSES
 

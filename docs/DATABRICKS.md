@@ -54,8 +54,9 @@ Upload to a Volume, one folder per upload box — the same boxes as the SME repo
 └── ho_so_khac/               anything else
 ```
 
-A file outside every box is skipped and named in the step log. In cell 4 set
-`INPUT_PATHS = ["/Volumes/.../khdn_abc"]`, `LOAN_DATE`, `BORROWER_NAMES`, and
+A file outside every box is skipped and named in the step log. In cell 3 set
+`CASES_DIR = Path("/Volumes/.../ho_so")`, `TESTCASE_IDS = ["khdn_abc", ...]` (folder names inside it),
+`LOAN_DATE`, `BORROWER_NAMES`, and
 `OUTPUT_DIR = Path("/Volumes/.../logs")`.
 
 ## 6. Run All
