@@ -73,6 +73,22 @@ def save_run(result: dict[str, Any], run_dir: Path) -> Path:
     return run_dir
 
 
+def failed_extractions(result: dict[str, Any]) -> list[str]:
+    """[12/11] "file (lượt): lý do" for every extraction pass that should have run and gave nothing —
+    same check as the WARNING of the single-case cell (a 429 that outlasted the retries lands here)."""
+
+    from src.agents.supervisor import EXTRACTION_PASSES
+
+    out = []
+    for doc in result.get("document_classifications") or []:
+        if doc.get("extraction_error"):
+            out.append(f"{doc.get('filename')} (đọc file): {doc['extraction_error']}")
+        for p in EXTRACTION_PASSES:
+            if doc.get(p.flag_attr) and not doc.get(p.result_attr):
+                out.append(f"{doc.get('filename')} ({p.label}): {doc.get(p.error_attr) or 'không rõ lý do'}")
+    return out
+
+
 def run_cases(supervisor: Any, case_ids: list[str], samples_dir: Path, output_dir: Path,
               per_case: dict[str, dict[str, Any]] | None = None, **shared: Any) -> list[dict[str, Any]]:
     """Run ``supervisor.process`` for each case folder ``samples_dir / case_id`` and save it.
@@ -92,9 +108,11 @@ def run_cases(supervisor: Any, case_ids: list[str], samples_dir: Path, output_di
             result = supervisor.process(inputs, **settings)
             run_dir = save_run(result, Path(output_dir) / f"{case_id}_{datetime.now():%Y%m%d_%H%M%S}")
             group = ((result.get("corp_income") or {}).get("corp_group") or {}).get("group", "")
-            failed = sum(1 for d in result.get("document_classifications") or [] if d.get("extraction_error"))
-            row.update({"status": "OK", "files": len(result.get("document_classifications") or []),
-                        "extraction_errors": failed, "corp_group": group, "output": str(run_dir)})
+            failed = failed_extractions(result)
+            row.update({"status": "OK" if not failed else "THIẾU TRÍCH XUẤT",
+                        "files": len(result.get("document_classifications") or []),
+                        "extraction_errors": len(failed), "failed": "; ".join(failed),
+                        "corp_group": group, "output": str(run_dir)})
         except Exception as exc:  # noqa: BLE001 — one case must not stop the batch
             row.update({"status": "LỖI", "error": f"{type(exc).__name__}: {exc}"})
             traceback.print_exc()
