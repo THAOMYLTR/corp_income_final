@@ -104,5 +104,95 @@ class Update1311Test(unittest.TestCase):
         self.assertEqual(short_name("Ngân hàng TMCP Thịnh vượng và Phát triển"), "PG Bank")
 
 
+class Tighten1311Test(unittest.TestCase):
+    """[13/11] 3 điểm siết: không đổi logic cũ khi không cần, không gộp nhầm hai người thật."""
+
+    @staticmethod
+    def rec(pass_name, doc_type, data, source="customer", date_=None):
+        if date_:
+            data = {**data, "document_date": date_}
+        return {"pass": pass_name, "source": source, "document": f"{doc_type}.pdf",
+                "document_type": doc_type, "data": data}
+
+    def run_items(self, recs):
+        return legal_checks.run_all_checks(recs, AS_OF)
+
+    # ---- Luật 1 ----
+    def test_dkkd_with_any_ratio_keeps_the_old_priority(self):
+        recs = [self.rec("shareholders", "gcn_dkdn", {"members": [
+                    {"name": "Nguyễn Văn A", "ownership_pct": 60}, {"name": "Trần Văn B", "ownership_pct": None}]}),
+                self.rec("shareholders", "dieu_le", {"members": [
+                    {"name": "Nguyễn Văn A", "ownership_pct": 50}, {"name": "Trần Văn B", "ownership_pct": 50}]})]
+        members = self.run_items(recs)[2]["summary"]["members"]
+        self.assertEqual(members[0]["ownership_pct"], 60.0)                  # vẫn lấy ĐKKD như cũ
+        self.assertIn("gcn_dkdn.pdf", members[0]["source"])
+
+    def test_newer_dkkd_without_ratios_warns_when_older_charter_is_used(self):
+        recs = [self.rec("shareholders", "gcn_dkdn", {"members": [{"name": "Lê Văn C"}]}, date_="01/03/2025"),
+                self.rec("shareholders", "dieu_le", {"members": [{"name": "Nguyễn Văn A", "ownership_pct": 100}]},
+                         date_="22/08/2016")]
+        items = self.run_items(recs)
+        self.assertEqual(items[2]["summary"]["members"][0]["name"], "Nguyễn Văn A")
+        codes = {f["code"]: f["severity"] for f in items[2]["findings"]}
+        self.assertEqual(codes.get("members_from_older_doc"), "warning")
+
+    def test_no_warning_when_the_used_document_is_newer(self):
+        recs = [self.rec("shareholders", "gcn_dkdn", {"members": [{"name": "Lê Văn C"}]}, date_="01/03/2020"),
+                self.rec("shareholders", "dieu_le", {"members": [{"name": "Lê Văn C", "ownership_pct": 100}]},
+                         date_="01/03/2025")]
+        codes = {f["code"] for f in self.run_items(recs)[2]["findings"]}
+        self.assertNotIn("members_from_older_doc", codes)
+
+    def test_ratio_is_not_borrowed_from_an_older_document(self):
+        recs = [self.rec("shareholders", "gcn_dkdn", {"members": [
+                    {"name": "Nguyễn Văn A", "capital_amount": 5}, {"name": "Trần Văn B"}]}, date_="01/03/2025"),
+                self.rec("shareholders", "dieu_le", {"members": [{"name": "Trần Văn B", "ownership_pct": 40}]},
+                         date_="22/08/2016")]
+        pct = {m["name"]: m["ownership_pct"] for m in self.run_items(recs)[2]["summary"]["members"]}
+        self.assertIsNone(pct["Trần Văn B"])
+
+    def test_single_owner_company_keeps_the_dkkd_owner(self):
+        recs = [self.rec("legal_basic", "gcn_dkdn", {"company_name": "CÔNG TY TNHH MỘT THÀNH VIÊN ABC"}),
+                self.rec("shareholders", "gcn_dkdn", {"members": [{"name": "Lê Văn C"}]}, date_="01/03/2025"),
+                self.rec("shareholders", "dieu_le", {"members": [{"name": "Nguyễn Văn A", "ownership_pct": 100}]},
+                         date_="22/08/2016")]
+        members = self.run_items(recs)[2]["summary"]["members"]
+        self.assertEqual([(m["name"], m["ownership_pct"]) for m in members], [("Lê Văn C", 100.0)])
+
+    # ---- Luật 2 ----
+    def test_two_real_people_in_one_document_stay_two(self):
+        recs = [self.rec("legal_basic", "gcn_dkdn", {"legal_representatives": [
+            {"name": "Phan Văn An"}, {"name": "Phạm Văn An"}]})]
+        reps = self.run_items(recs)[3]["summary"]["legal_representatives"]
+        self.assertEqual(len(reps), 2)
+
+    def test_two_real_people_in_one_document_get_two_rows(self):
+        from src.utils.report.appendix_context import build_appendix_context
+        recs = [self.rec("legal_basic", "gcn_dkdn", {"legal_representatives": [{"name": "Phan Văn An"}]}),
+                self.rec("shareholders", "dieu_le", {"members": [
+                    {"name": "Phan Văn An", "ownership_pct": 50}, {"name": "Phạm Văn An", "ownership_pct": 50}]})]
+        items = self.run_items(recs)
+        ctx = build_appendix_context({"items": items, "meta": {"borrower_names": ["Phan Văn An"]}}, recs,
+                                     fm.compute([fin([Y2025])], AS_OF), AS_OF)
+        rows = [r for r in ctx["RowsThanhVien"].splitlines() if r.startswith("|")]
+        self.assertEqual(len(rows), 2)
+        marked = [r.split("|")[1].strip() for r in rows if "(*)" in r]
+        self.assertEqual(marked, ["Phan Văn An (*)"])                       # chỉ đúng người vay
+
+    def test_ocr_slip_across_documents_is_merged(self):
+        recs = [self.rec("legal_basic", "gcn_dkdn", {"legal_representatives": [{"name": "PHAN QUANG ĐIỀN"}]}),
+                self.rec("legal_rep", "bao_cao_thuc_dia", {"legal_representatives": [{"name": "PHẠM QUANG ĐIỀN"}]},
+                         source="field")]
+        reps = self.run_items(recs)[3]["summary"]["legal_representatives"]
+        self.assertEqual([r["name"] for r in reps], ["PHAN QUANG ĐIỀN"])
+
+    # ---- Luật 3 ----
+    def test_prompt_keeps_listed_founders(self):
+        with open("config/prompts/shareholders_extraction.md", encoding="utf-8") as handle:
+            text = handle.read()
+        self.assertIn("cổ đông sáng\n  lập", text)
+        self.assertNotIn("thường không in danh sách cổ đông", text)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -26,9 +26,9 @@ QUY TẮC RIÊNG:
 - "ownership_pct": tỷ lệ sở hữu ĐÚNG NHƯ IN, dạng SỐ phần trăm (35 nghĩa là
   35%; "7,5%" ghi 7.5 — dấu phẩy là dấu thập phân, không kèm "%", không để trong ngoặc kép).
   Văn bản không in tỷ lệ thì để null — KHÔNG tự chia vốn góp cho vốn điều lệ.
-- [13/11] "members" CHỈ gồm người / tổ chức GÓP VỐN, nằm trong danh sách cổ đông / thành viên của
-  văn bản. Người đại diện theo pháp luật, giám đốc… không có tên trong danh sách đó thì KHÔNG đưa vào
-  "members". GCN ĐKDN công ty cổ phần thường không in danh sách cổ đông → "members": [].
+- [13/11] "members" CHỈ gồm những người / tổ chức mà văn bản IN TRONG DANH SÁCH cổ đông / cổ đông sáng
+  lập / thành viên góp vốn / chủ sở hữu. Người đại diện theo pháp luật, giám đốc… chỉ đưa vào khi tên họ
+  có trong danh sách đó. Văn bản không có danh sách nào như vậy thì "members": [].
 - [13/11] "name" là HỌ TÊN người / tên tổ chức, KHÔNG BAO GIỜ là chức danh. Văn bản chỉ ghi chức
   danh ("Giám đốc", "Người đại diện theo pháp luật", "Chủ tịch HĐQT"…) mà không có họ tên thì KHÔNG
   tạo phần tử đó — không điền chức danh vào "name".
