@@ -28,7 +28,7 @@ from src.agents.calculator import business_model, cic_metrics
 from src.agents.calculator import industry as industry_table
 from src.utils.report.visualization.debt_chart import debt_chart
 from src.agents.calculator import financial_metrics as fm
-from src.agents.calculator.legal_checks import norm_person, parse_date
+from src.agents.calculator.legal_checks import is_title_not_name, norm_person, parse_date, same_person
 from src.agents.documents.document_matrix import get_type
 from src.utils.common import normalize_text
 
@@ -180,8 +180,10 @@ def _field_people(records: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         if record.get("pass") != "shareholders" or record.get("source") != "field":
             continue
         for person in record["data"].get("people") or []:
-            if isinstance(person, dict) and person.get("name"):
-                entry = found.setdefault(norm_person(person["name"]), {"name": person["name"]})
+            # [13/11] bỏ "tên" chỉ là chức danh ("Giám đốc"); gộp tên lệch họ do OCR
+            if isinstance(person, dict) and person.get("name") and not is_title_not_name(person["name"]):
+                key = next((k for k in found if same_person(k, person["name"])), norm_person(person["name"]))
+                entry = found.setdefault(key, {"name": person["name"]})
                 for field in ("position", "relation_to_borrower", "influence", "assessment"):
                     if not entry.get(field) and person.get(field):
                         entry[field] = " ".join(str(person[field]).split())
@@ -383,15 +385,32 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     people = _field_people(records)
     rows, seen = [], set()
 
-    def person_row(name: str, pct: Any) -> list[str]:
+    def match(table: dict, key: str) -> Any:
+        """[13/11] Exact key, else the same person with an OCR slip in the surname."""
+        if key in table:
+            return table[key]
+        return next((v for k, v in table.items() if same_person(k, key)), None)
+
+    def is_seen(key: str) -> bool:
+        return key in seen or any(same_person(k, key) for k in seen)
+
+    def person_row(name: str, pct: Any, is_member: bool = False) -> list[str]:
         key = norm_person(name)
         seen.add(key)
-        info = people.get(key, {})
+        info = match(people, key) or {}
         # [Template 12/11] "(*)" sau tên người đứng ra vay
-        mark = " (*)" if key and key in {norm_person(b) for b in borrower_names or []} else ""
+        mark = " (*)" if key and any(same_person(key, b) for b in borrower_names or []) else ""
+        # [Sửa 13/11] Thành viên góp vốn chưa rõ tỷ lệ → "—" (trước đây ghi "0", trông như không góp vốn);
+        # người không có trong danh sách thành viên (đại diện PL, ban lãnh đạo) vẫn ghi "0".
+        if pct is not None:
+            pct_text = f"{float(pct):g}".replace(".", ",")
+        elif is_member or "gop von" in normalize_text(str(info.get("position") or "")):
+            pct_text = "—"
+        else:
+            pct_text = "0"
         return [(name or NO_INFO) + mark,
-                "0" if pct is None else f"{float(pct):g}".replace(".", ","),
-                _position(info.get("position"), reps.get(key), pct),
+                pct_text,
+                _position(info.get("position"), match(reps, key), pct),
                 info.get("relation_to_borrower") or _relation_to_borrower(records, key, borrowers),
                 info.get("influence") or "—",
                 info.get("assessment") or "—"]
@@ -399,12 +418,12 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
     members = sorted(items[2]["summary"].get("members", []),
                      key=lambda m: -(m.get("ownership_pct") or 0))
     for member in members:
-        rows.append(person_row(member.get("name"), member.get("ownership_pct")))
+        rows.append(person_row(member.get("name"), member.get("ownership_pct"), is_member=True))
     for key, rep in reps.items():               # legal representatives without capital
-        if key and key not in seen:
+        if key and not is_seen(key):
             rows.append(person_row(rep.get("name"), None))
     for key, info in people.items():            # management named only in the site-visit report
-        if key and key not in seen:
+        if key and not is_seen(key):
             rows.append(person_row(info.get("name"), None))
     ctx["RowsThanhVien"] = "\n".join(_pipe_row(r) for r in rows or [[NO_INFO, "—", "—", "—", "—", "—"]])
     if any(r[0].endswith(" (*)") for r in rows):

@@ -1,5 +1,6 @@
 # [05/11/2026] Bộ viết tắt tên ngân hàng (sheet bank_abbr). Mỗi dòng: Tên viết tắt(Mã): Tên đầy đủ.
-# Bảng dư nợ tại TCTD (mục 4a) hiển thị phần trước dấu "(" — vd "Vietcombank". "(tên cũ: …)" cũng được nhận.
+# Bảng dư nợ tại TCTD (mục 4a) hiển thị phần trước dấu "(" — vd "Vietcombank". "(tên cũ: …)" và "(tên khác: …)" cũng được nhận.
+# [13/11] Tên đầy đủ phải đúng THỨ TỰ TỪ như CIC ghi — vd VPBank là "Việt Nam Thịnh Vượng"; thứ tự khác thì thêm "(tên khác: …)".
 Agribank: Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam
 BIDV: Ngân hàng TMCP Đầu tư và Phát triển Việt Nam
 Vietcombank(VCB): Ngân hàng TMCP Ngoại thương Việt Nam
@@ -33,7 +34,7 @@ TPBank(TPB): Ngân hàng TMCP Tiên Phong
 VIB: Ngân hàng TMCP Quốc Tế Việt Nam
 VietBank(VBB): Ngân hàng TMCP Việt Nam Thương Tín
 VietABank(VAB): Ngân hàng TMCP Việt Á
-VPBank(VPB): Ngân hàng TMCP Thịnh Vượng Việt Nam
+VPBank(VPB): Ngân hàng TMCP Việt Nam Thịnh Vượng (tên khác: TMCP Thịnh Vượng Việt Nam)
 HSBC Việt Nam: Ngân hàng TNHH MTV HSBC Việt Nam
 Shinhan Bank: Ngân hàng TNHH MTV Shinhan Việt Nam
 Standard Chartered: Ngân hàng TNHH MTV Standard Chartered Việt Nam

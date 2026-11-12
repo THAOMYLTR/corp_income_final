@@ -23,8 +23,15 @@ QUY TẮC BẮT BUỘC:
 QUY TẮC RIÊNG:
 - Mỗi cổ đông/thành viên là một dòng "members". "member_type": "ca_nhan" (cá
   nhân) hoặc "phap_nhan" (tổ chức/doanh nghiệp).
-- "ownership_pct": tỷ lệ sở hữu ĐÚNG NHƯ IN, dạng số phần trăm (35 nghĩa là
-  35%). Văn bản không in tỷ lệ thì để null — KHÔNG tự chia vốn góp cho vốn điều lệ.
+- "ownership_pct": tỷ lệ sở hữu ĐÚNG NHƯ IN, dạng SỐ phần trăm (35 nghĩa là
+  35%; "7,5%" ghi 7.5 — dấu phẩy là dấu thập phân, không kèm "%", không để trong ngoặc kép).
+  Văn bản không in tỷ lệ thì để null — KHÔNG tự chia vốn góp cho vốn điều lệ.
+- [13/11] "members" CHỈ gồm người / tổ chức GÓP VỐN, nằm trong danh sách cổ đông / thành viên của
+  văn bản. Người đại diện theo pháp luật, giám đốc… không có tên trong danh sách đó thì KHÔNG đưa vào
+  "members". GCN ĐKDN công ty cổ phần thường không in danh sách cổ đông → "members": [].
+- [13/11] "name" là HỌ TÊN người / tên tổ chức, KHÔNG BAO GIỜ là chức danh. Văn bản chỉ ghi chức
+  danh ("Giám đốc", "Người đại diện theo pháp luật", "Chủ tịch HĐQT"…) mà không có họ tên thì KHÔNG
+  tạo phần tử đó — không điền chức danh vào "name".
 - "acquisition_method": "gop_von_thanh_lap" (góp khi thành lập) |
   "nhan_chuyen_nhuong" | "tang_von" | "thua_ke_tang_cho" | "khac" | ''.
 - "transfers": mọi giao dịch chuyển nhượng vốn góp/cổ phần nêu trong văn bản.
