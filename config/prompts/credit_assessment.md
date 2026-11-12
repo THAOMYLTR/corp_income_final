@@ -11,12 +11,14 @@ CÁCH NGHĨ (làm lần lượt):
 1. Tìm các RỦI RO có thể làm hỏng khoản vay: pháp lý không chắc chắn, HĐKD không chứng minh
    được, tài chính bất thường / suy giảm, lịch sử tín dụng xấu, KH vay không thực sự sở hữu /
    kiểm soát DN, dòng tiền về KH cá nhân không chắc chắn.
-2. Với mỗi rủi ro: mức độ (cao / trung bình / thấp), căn cứ cụ thể (số liệu + tên file),
-   có biện pháp giảm thiểu nào không.
+2. Với mỗi rủi ro: mức độ (cao / trung bình / thấp), căn cứ cụ thể (số liệu / ngày / tên đối tượng,
+   KHÔNG ghi tên file — BRD 29/10), có biện pháp giảm thiểu nào không.
 3. Tìm ĐIỂM MẠNH thật sự có số liệu chứng minh (không khen chung chung).
 4. Ra QUYẾT ĐỊNH:
-   - "Không sử dụng" — khi "phan_nhom_doanh_nghiep.group" là Bad corp (BẮT BUỘC), hoặc có
-     rủi ro cao không có biện pháp giảm thiểu.
+   - "Không sử dụng" — khi "phan_nhom_doanh_nghiep.group" là Bad corp (BẮT BUỘC; tiêu chí Bad corp theo
+     mục 5 guidance: DN không hoạt động theo tra cứu thuế, thành lập < 12 tháng tính từ ngày đăng ký lần đầu,
+     ngành nghề thực tế không phù hợp chứng từ, DN không hoạt động theo thẩm định thực tế, Bad finance,
+     Bad bureau), hoặc có rủi ro cao không có biện pháp giảm thiểu.
    - "Sử dụng có điều kiện" — Normal corp, hoặc còn rủi ro trung bình / thiếu hồ sơ quan
      trọng; nêu rõ điều kiện (bổ sung tài liệu gì, xác minh gì, trước khi giải ngân).
    - "Sử dụng" — Good corp và không có rủi ro trung bình trở lên chưa được giảm thiểu.
@@ -24,7 +26,7 @@ CÁCH NGHĨ (làm lần lượt):
    của con số đó (đủ / thiếu thành phần nào).
 
 QUY TẮC:
-- Chỉ dùng dữ liệu được gửi. Không suy diễn. Mỗi căn cứ có số liệu / ngày / tên file.
+- Chỉ dùng dữ liệu được gửi. Không suy diễn. Mỗi căn cứ có số liệu / ngày, không ghi tên file.
 - Không tự tính số mới; không tự phân nhóm lại (dùng "phan_nhom_doanh_nghiep").
 - "anh_huong_theo_muc": với từng mục, MỘT câu "so-what" — điều này làm quyết định tín dụng
   mạnh lên hay yếu đi, và vì sao.

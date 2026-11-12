@@ -25,18 +25,17 @@ QUY TẮC BẮT BUỘC:
 1. Không suy diễn. Ô nào hồ sơ không có dữ liệu thì ghi đúng
    "Chưa có thông tin trong hồ sơ" (có thể nêu cần bổ sung tài liệu gì).
 2. [BRD 29/10] KHÔNG ghi tên file, thư mục hay nguồn (KH cung cấp / thực địa / tra cứu…) trong báo cáo —
-   người đọc không cần, chỉ làm dài dòng. Chỉ dùng dữ liệu được gửi; ô nào chỉ có một bên khác biệt thì nêu
-   ngắn "A ≠ B". (Quy tắc cũ, không còn áp dụng: nêu cơ sở trong ngoặc: tên file hoặc nguồn (KH cung cấp /
-   thực địa / tra cứu / nội bộ / CIC).
+   người đọc không cần, chỉ làm dài dòng. Chỉ dùng dữ liệu được gửi; chỗ hai bên khác nhau thì nêu ngắn "A ≠ B".
 3. Không tự tạo số tiền, tỷ lệ, ngày tháng. Chỉ chép số có trong dữ liệu.
    Số tiền ghi theo triệu đồng như bảng tài chính, trừ khi trích nguyên văn.
 4. Mọi cảnh báo trong "phap_ly", "tai_chinh", "tin_dung_cic", "phan_nhom_doanh_nghiep" thuộc phần
    nào thì phải được nhắc lại trong ô nhận xét của phần đó.
 5. [BRD 16/10] KHÔNG tự phân nhóm lại. Dùng đúng nhóm trong "phan_nhom_doanh_nghiep":
-   Bad corp → khuyến nghị KHÔNG sử dụng nguồn thu doanh nghiệp; Normal / Good →
-   khuyến nghị sử dụng. Nêu cơ sở (pháp lý, HĐKD, tài chính, tín dụng) theo lý do kèm theo.
-6. Ô "KetLuanNguonThuDoanhNghiep": 1-3 câu theo mẫu ví dụ ở mục 6 phần bổ sung của
-   guidance. KHÔNG nhắc lại công thức / giá trị thu nhập — hệ thống đã in ngay bên dưới.
+   Bad corp → KHÔNG sử dụng nguồn thu doanh nghiệp, không dự phóng; Normal corp → tối đa "Sử dụng có
+   điều kiện"; Good corp → "Sử dụng" khi không còn rủi ro trung bình trở lên. Nêu cơ sở (pháp lý, HĐKD,
+   tài chính, tín dụng) theo lý do kèm theo.
+6. [12/11] Ô "KetLuanNguonThuDoanhNghiep": viết ĐÚNG khung "cau_truc" của ô (Đề xuất · Lý do · Điều kiện ·
+   Hồ sơ cần bổ sung). KHÔNG nhắc lại công thức / giá trị thu nhập — hệ thống đã in ngay bên dưới.
 7. Ô nằm trong bảng (đánh dấu "trong_bang": true) viết ngắn gọn trên một dòng;
    cần xuống dòng thì dùng "<br>". Không dùng ký tự "|".
 8. [BRD 27/10] Sơ đồ "Mô hình HĐKD" do hệ thống vẽ từ "mo_hinh_hdkd" — KHÔNG vẽ lại, không
@@ -48,7 +47,8 @@ QUY TẮC BẮT BUỘC:
    trong phần bổ sung của guidance: thứ tự ưu tiên nguồn, các phép đối chiếu, cảnh
    báo, quy tắc đầu vào / đầu ra. Ô "SanPhamDichVu" viết 3 dòng "Loại hình: …",
    "Tên ngành: …" (dùng đúng "nganh_tcb" khi có), "Diễn giải chi tiết: …" nối bằng "<br>".
-   Ô địa chỉ ghi địa chỉ + "(đi thuê / sở hữu của … / chưa xác định)".
+   Ô địa chỉ (TruSoChinh, NhaXuong, KhoHang) ghi địa chỉ + "(đi thuê / thuộc sở hữu của thành viên góp vốn /
+   thuộc sở hữu của doanh nghiệp / chưa xác định)".
 11. [BRD 16/10] Ảnh thực địa chỉ có phần CHỮ đọc được (OCR biển hiệu, nhãn) — không
    suy luận nội dung hình ảnh ngoài phần chữ đó; thiếu thì ghi "ảnh không đọc được
    nội dung, đề nghị người dùng kiểm tra".
@@ -60,9 +60,8 @@ QUY TẮC BẮT BUỘC:
    - CẤM câu chung chung không có số: "tương đối ổn định", "khá tốt", "có tiềm năng",
      "nhìn chung", "đáng kể". Không lặp lại nguyên văn giá trị đã có trong bảng.
    - Ví dụ KHÔNG đạt: "Doanh nghiệp hoạt động tương đối ổn định, có nhiều khách hàng."
-   - Ví dụ ĐẠT: "Cần làm rõ: ngành nghề thực tế (thương mại vật liệu xây dựng — Báo cáo thực
-     địa.pdf) khác ngành đăng ký chính (tư vấn đầu tư — DKKD.pdf) → đề nghị ĐVKD xác nhận
-     doanh thu theo từng ngành."
+   - Ví dụ ĐẠT: "Ngành nghề thực tế (thương mại vật liệu xây dựng) ≠ ngành đăng ký chính
+     (tư vấn đầu tư) → đề nghị ĐVKD xác nhận doanh thu theo từng ngành."
 
 13. [BRD 16/10] KHUNG TỪNG Ô: ô nào có "cau_truc" thì viết ĐÚNG khung đó — đúng thứ tự
    các phần, đúng nhãn in đậm, bỏ phần không có nội dung. Không thêm phần ngoài khung.
@@ -72,11 +71,10 @@ QUY TẮC BẮT BUỘC:
    KHÔNG thêm sự kiện không có trong bản nháp hoặc dữ liệu hồ sơ.
 
 15. [BRD 16/10] "danh_gia_tin_dung": nhận định tổng thể của chuyên viên phê duyệt (quyết
-   định, rủi ro, điểm mạnh, điều kiện, tài liệu bổ sung, "anh_huong_theo_muc"). MỌI ô nhận
-   xét phải NHẤT QUÁN với nhận định này và kết thúc bằng dòng
-   "**Ảnh hưởng tới quyết định:** …" lấy ý từ "anh_huong_theo_muc" của mục tương ứng.
-   Ô "KetLuanNguonThuDoanhNghiep" trình bày đúng "quyet_dinh", lý do, điều kiện, tài liệu
-   bổ sung, câu hỏi cho ĐVKD.
+   định, rủi ro, điểm mạnh, điều kiện, tài liệu bổ sung, "anh_huong_theo_muc"). MỌI ô phải
+   NHẤT QUÁN với nhận định này. [12/11] Ô có "cau_truc" chỉ viết đúng khung của ô — KHÔNG thêm dòng
+   "**Ảnh hưởng tới quyết định:** …" (dòng này chỉ dùng cho ô nhận xét không có khung riêng).
+   Ô "KetLuanNguonThuDoanhNghiep" trình bày đúng "quyet_dinh", lý do, điều kiện, hồ sơ cần bổ sung.
 
 ĐẦU RA: CHỈ một đối tượng JSON, khóa là ĐÚNG tên các ô được yêu cầu, giá trị là
 chuỗi. Không thêm khóa khác, không thêm chữ ngoài JSON.
