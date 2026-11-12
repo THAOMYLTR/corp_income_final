@@ -387,7 +387,9 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
         key = norm_person(name)
         seen.add(key)
         info = people.get(key, {})
-        return [name or NO_INFO,
+        # [Template 12/11] "(*)" sau tên người đứng ra vay
+        mark = " (*)" if key and key in {norm_person(b) for b in borrower_names or []} else ""
+        return [(name or NO_INFO) + mark,
                 "0" if pct is None else f"{float(pct):g}".replace(".", ","),
                 _position(info.get("position"), reps.get(key), pct),
                 info.get("relation_to_borrower") or _relation_to_borrower(records, key, borrowers),
@@ -405,6 +407,8 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
         if key and key not in seen:
             rows.append(person_row(info.get("name"), None))
     ctx["RowsThanhVien"] = "\n".join(_pipe_row(r) for r in rows or [[NO_INFO, "—", "—", "—", "—", "—"]])
+    if any(r[0].endswith(" (*)") for r in rows):
+        ctx["RowsThanhVien"] += "\n\n_(*) Người đứng ra vay._"
 
     # ---- Cảnh báo pháp lý: shown only when there is one (no file names, no folders) ----
     warn = []
@@ -635,9 +639,13 @@ def income_block(corp: dict[str, Any], income: dict[str, Any]) -> str:
             f"{proj['industry']} — phân khúc {proj.get('segment') or 'SME'}, tăng trưởng ngành {fm.pct(proj['industry_growth'])}, ROS ngành "
             f"{fm.pct(proj['industry_ros'])})_",
             "",
-            f"- Doanh thu dự phóng khả thi = min[DT theo PAKD; DT {year} × (1 + tăng trưởng ngành{k})] = "
-            f"min[{fm.fmt(proj['plan_revenue'])}; {fm.fmt(proj['revenue_n'])} × (1 + "
-            f"{fm.pct(proj['industry_growth'])}{k})] = **{fm.fmt(proj['feasible_revenue'])}** triệu đồng",
+            (f"- Doanh thu dự phóng khả thi = min[DT theo PAKD; max[DT thực tế {proj['plan_year']} theo tờ khai VAT; "
+             f"DT {year} × (1 + tăng trưởng ngành{k})]] = min[{fm.fmt(proj['plan_revenue'])}; max["
+             f"{fm.fmt(proj['vat_actual'])}; {fm.fmt(proj['revenue_n'])} × (1 + {fm.pct(proj['industry_growth'])}{k})]] = "
+             f"**{fm.fmt(proj['feasible_revenue'])}** triệu đồng") if proj.get("vat_actual") else
+            (f"- Doanh thu dự phóng khả thi = min[DT theo PAKD; DT {year} × (1 + tăng trưởng ngành{k})] = "
+             f"min[{fm.fmt(proj['plan_revenue'])}; {fm.fmt(proj['revenue_n'])} × (1 + "
+             f"{fm.pct(proj['industry_growth'])}{k})] = **{fm.fmt(proj['feasible_revenue'])}** triệu đồng"),
             f"- Tỷ suất lợi nhuận dự phóng khả thi = min{{ROS PAKD; max[ROS {year}; ROS ngành]}} = "
             f"min{{{fm.pct(proj['plan_ros'])}; max[{fm.pct(proj['ros_hist'])}; {fm.pct(proj['industry_ros'])}]}} = "
             f"**{fm.pct(proj['feasible_ros'])}**",

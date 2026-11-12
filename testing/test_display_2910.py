@@ -176,6 +176,33 @@ class Guidance1011Test(unittest.TestCase):
         self.assertEqual(fm.income_estimate(f, 100, 50 * M)["lnst_for_lt_debt"], 45 * M)
 
 
+class Update1211Test(unittest.TestCase):
+    def test_single_owner_company_owns_100(self):
+        from src.agents.calculator.legal_checks import is_single_owner_form
+        self.assertTrue(is_single_owner_form("CÔNG TY TNHH MỘT THÀNH VIÊN ABC"))
+        self.assertTrue(is_single_owner_form("Công ty TNHH MTV ABC"))
+        self.assertTrue(is_single_owner_form("DOANH NGHIỆP TƯ NHÂN XYZ"))
+        self.assertFalse(is_single_owner_form("Công ty TNHH Thương mại ABC"))
+        records = [{"pass": "legal_basic", "source": "customer", "document": "dkkd.pdf", "document_type": "gcn_dkdn",
+                    "data": {"company_name": "CÔNG TY TNHH MỘT THÀNH VIÊN ABC"}},
+                   {"pass": "shareholders", "source": "customer", "document": "dkkd.pdf", "document_type": "gcn_dkdn",
+                    "data": {"members": [{"name": "Nguyễn Văn A", "member_type": "ca_nhan", "ownership_pct": None}]}}]
+        members = legal_checks.run_all_checks(records, AS_OF)[2]["summary"]["members"]
+        self.assertEqual(members[0]["ownership_pct"], 100.0)
+
+    def test_feasible_revenue_takes_the_vat_actual_when_higher(self):
+        f = fm.compute([fin([Y2025, Y2024])], AS_OF)
+        revenue = f["years"][f["latest_year"]]["net_revenue"]
+        industry = {"name": "X", "segment": "SME", "ros": 0.05, "growth": 0.10}
+        plan = {"plan_year": 2026, "plan_revenue": revenue * 2, "plan_profit_after_tax": revenue * 0.1}
+        f["vat"] = {"by_year": {2026: {"revenue": revenue * 1.5, "months": list(range(1, 10))}}}
+        proj = fm.income_estimate(f, 100, None, plan, industry, "Normal corp")["projection"]
+        self.assertAlmostEqual(proj["feasible_revenue"], revenue * 1.5)      # max[VAT 1,5×; 1,1×] < PAKD 2×
+        f["vat"] = {"by_year": {}}
+        proj = fm.income_estimate(f, 100, None, plan, industry, "Normal corp")["projection"]
+        self.assertAlmostEqual(proj["feasible_revenue"], revenue * 1.1)
+
+
 class TemplateTest(unittest.TestCase):
     def test_no_t24_row(self):
         with open("src/templates/corp-income-structure.md", encoding="utf-8") as handle:

@@ -208,7 +208,7 @@ class AppendixTemplateTest(CorpIncomeWorkflowTest):
         self.assertIn("| Năm thành lập | 2015 (Đăng ký lần đầu 12/05/2015; thay đổi lần thứ 6 ngày 20/03/2026) |",
                       report)
         # [BRD 29/10] 1b: tên | tỷ lệ | chức vụ | quan hệ | ảnh hưởng | năng lực (last three: site report)
-        self.assertIn("| Nguyễn Văn A | 60 | Thành viên góp vốn | KH vay (người đứng ra vay) | — | — |", report)
+        self.assertIn("| Nguyễn Văn A (*) | 60 | Thành viên góp vốn | KH vay (người đứng ra vay) | — | — |", report)
         self.assertIn("| Trần Thị B | 0 | Giám đốc kiêm người đại diện theo pháp luật |", report)
         self.assertNotIn("{{", report)
 

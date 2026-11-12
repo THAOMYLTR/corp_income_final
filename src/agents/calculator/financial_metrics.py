@@ -680,7 +680,12 @@ def income_estimate(financials: dict[str, Any], ownership_pct: float | None,
         else:
             k = GOOD_CORP_GROWTH_FACTOR if corp_group == "Good corp" else 1.0
             cap = revenue * (1 + industry["growth"] * k)
-            feasible_rev = min(plan_rev, cap)
+            # [Template 12/11] min[DT PAKD; max[DT thực tế năm kế hoạch theo tờ khai VAT; DT năm N × (1 + g × k)]]
+            plan_year = plan.get("plan_year")
+            vat_year = ((financials.get("vat") or {}).get("by_year") or {}).get(int(plan_year)) \
+                if str(plan_year or "").isdigit() else None
+            vat_actual = (vat_year or {}).get("revenue")
+            feasible_rev = min(plan_rev, max(cap, vat_actual or 0))
             floor = max(x for x in (ros_hist, industry.get("ros")) if x is not None) \
                 if any(x is not None for x in (ros_hist, industry.get("ros"))) else None
             feasible_ros = plan_ros if floor is None else min(plan_ros, floor)
@@ -689,7 +694,7 @@ def income_estimate(financials: dict[str, Any], ownership_pct: float | None,
                 "industry": industry.get("name"), "segment": industry.get("segment"),
                 "industry_growth": industry["growth"],
                 "industry_ros": industry.get("ros"), "growth_factor": k, "revenue_n": revenue,
-                "revenue_cap": cap, "feasible_revenue": feasible_rev, "ros_hist": ros_hist,
+                "revenue_cap": cap, "vat_actual": vat_actual, "feasible_revenue": feasible_rev, "ros_hist": ros_hist,
                 "feasible_ros": feasible_ros, "lnst": feasible_ros * feasible_rev,
             }
     reasonable = projection["lnst"] if projection else historical

@@ -190,7 +190,7 @@ x Tỷ lệ góp vốn
 - MST, Người đại diện theo PL: ưu tiên ĐKKD → Điều lệ / Sổ cổ đông → Báo cáo khảo sát thực địa. Ghi cảnh báo nếu không khớp.
 - Năm thành lập: ưu tiên ĐKKD, ghi đủ "Đăng ký lần đầu … thay đổi lần thứ …". Cảnh báo nếu không khớp.
 - Tình trạng hoạt động: theo tra cứu thuế (masothue.com); bôi đỏ, đậm nếu không hoạt động / tạm dừng.
-- Họ tên, tỷ lệ góp vốn: ưu tiên Sổ cổ đông / Sổ chứng nhận lưu ký (CTCP) / Danh sách thành viên góp vốn (TNHH), sau đó Điều lệ.
+- Họ tên, tỷ lệ góp vốn: ưu tiên Sổ cổ đông / Sổ chứng nhận lưu ký (CTCP) / Danh sách thành viên góp vốn (TNHH), sau đó Điều lệ. Nếu là loại hình công ty TNHH một thành viên hoặc doanh nghiệp tư nhân thì chủ sở hữu hoặc chủ doanh nghiệp ghi trên ĐKKD sẽ chính là người sở hữu 100% doanh nghiệp.  
 - Mối quan hệ: ghi nếu cổ đông là người đại diện theo PL; quan hệ giữa các thành viên ưu tiên lấy từ báo cáo khảo sát thực địa.
 - Thay đổi thành viên góp vốn / NĐDPL trong 12 tháng: tra cứu bocaodientu.gov.vn.
 - Nhận xét pháp lý KH: số năm hoạt động; % vốn góp KH vay nắm giữ, có là NĐDPL không; cảnh báo khi (tên, TSC, NĐDPL, năm thành lập) không phù hợp, DN không hoạt động / tạm ngưng, tổng tỷ lệ sở hữu ≠ 100%.
@@ -220,7 +220,7 @@ x Tỷ lệ góp vốn
 - Cảnh báo dấu hiệu bất thường BCTC: công ty kiểm toán thuộc danh sách loại trừ; Tổng TS ≠ Tổng NV; số liệu cuối kỳ năm trước ≠ đầu kỳ năm sau; chênh lệch LN chưa phân phối giữa hai kỳ > LNST trong kỳ; DTT trên BCTC khác biệt lớn so với tờ khai VAT / sao kê / phần mềm bán hàng cùng kỳ; chi phí lãi vay không tương quan với dư nợ BQ CIC × 10%/năm; thuế TNDN / LNTT ≠ 20% (trừ ngành / địa bàn ưu đãi).
 - Trạng thái tài chính: phân khúc theo doanh thu năm gần nhất (LC (Large Corp) ≥ 2000 tỷ; MM ≥ 600 tỷ; USME ≥ 200 tỷ; SME >= 80 tỷ, MSME < 80 tỷ); DT giảm > 20% → HĐKD suy giảm; (thu nhập khác + DT tài chính) / LNTT > 20%; chi phí lãi vay / LN gộp > 50%; ROS < 0; hệ số thanh toán hiện hành < 1.
 - Phân nhóm (chỉ hiển thị khi POC): Bad finance — BCTC mâu thuẫn trọng yếu nếu vi phạm vào một trong các yếu tố):
-     a. Với BCTC kiểm toán, công ty kiểm toán thuộc danh sách loại trừ (CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN - MST 0102662764) và Công ty TNHH Kiểm toán iGlobal - MST 0312075184
+     a. Với BCTC kiểm toán, công ty kiểm toán thuộc danh sách loại trừ (CÔNG TY TNHH KIỂM TOÁN VÀ TƯ VẤN BÌNH AN - MST 0102662764, Công ty TNHH Kiểm toán iGlobal - MST 0312075184)
      b. Tổng tài sản <> Tổng nguồn vốn; 
      c. Số liệu cuối kỳ của năm trước <> số liệu đầu kỳ của năm tiếp theo (trừ một số trường hợp đặc biệt: thay đổi năm tài chính, thay đổi chế độ kế toán hoặc tổ chức lại doanh nghiệp).
      d. Chênh lệch lợi nhuận chưa phân phối giữa kỳ này và kỳ trước vượt quá lợi nhuận sau thuế phát sinh trong kỳ, trừ khi có điều chỉnh hồi tố hoặc phân phối lại lợi nhuận; 
@@ -238,7 +238,7 @@ Normal — còn lại.
 - Nhận xét: chỉ tổng hợp thông tin KH cung cấp; cảnh báo khi doanh thu kế hoạch tăng mạnh không có cơ sở, mâu thuẫn với khảo sát thực địa hoặc kết quả kinh doanh lịch sử.
 
 **6. Kết luận nguồn thu doanh nghiệp** [code phân nhóm + giá trị; LLM viết nhận xét]
-- Bad corp (≥ 1 tiêu chí): DN không hoạt động theo tra cứu thuế, thời gian thành lập < 12 tháng (tính từ ngày đăng ký lần đầu trên ĐKKD); DN không hoạt động theo thẩm định thực tế; Bad finance; Bad bureau → khuyến nghị KHÔNG sử dụng nguồn thu doanh nghiệp, không đánh giá dự phóng.
+- Bad corp (≥ 1 tiêu chí): DN không hoạt động theo tra cứu thuế, thông tin pháp lý không phù hợp giữa các chứng từ, thời gian thành lập < 12 tháng; DN không hoạt động theo thẩm định thực tế; Bad finance; Bad bureau → khuyến nghị KHÔNG sử dụng nguồn thu doanh nghiệp, không đánh giá dự phóng.
 - Good corp: Good finance VÀ Good bureau. Normal corp: còn lại. Normal / Good → khuyến nghị sử dụng nguồn thu doanh nghiệp.
 - Ô "KetLuanNguonThuDoanhNghiep": 1-3 câu theo đúng nhóm trong "phan_nhom_doanh_nghiep", nêu cơ sở. Ví dụ:
   - "Trên cơ sở KHDN thời gian thành lập < 12 tháng, hoạt động kinh doanh chưa ổn định, khuyến nghị không sử dụng nguồn thu doanh nghiệp để đánh giá năng lực trả nợ lần này."
@@ -246,9 +246,8 @@ Normal — còn lại.
   - "Trên cơ sở DN HĐKD, trạng thái tài chính không có dấu hiệu không ổn định, lịch sử tín dụng tốt, khuyến nghị sử dụng nguồn thu doanh nghiệp để đánh giá năng lực trả nợ lần này."
 - Giá trị nguồn thu [code], TH không sử dụng phương án kinh doanh:
   - LNST hợp lý = LNST năm N-1 − doanh thu tài chính năm N-1 − thu nhập khác năm N-1.
-  - LNST sử dụng để trả nghĩa vụ TDH = nghĩa vụ trả gốc TDH hằng năm − khấu hao trong năm.
+  - LNST sử dụng để trả nghĩa vụ TDH = nghĩa vụ trả gốc TDH hằng năm − khấu hao trong năm. Trong trường hợp không xác định được nghĩa vụ trả gốc TDH hằng nằm hoặc không xác định được khấu hao trong năm thì LNST bằng 0. 
   - Lợi tức / cổ tức tối đa chia được cho KHCN = (LNST hợp lý − LNST sử dụng để trả nghĩa vụ TDH) × tỷ lệ góp vốn.
-  - Trường hợp không xác định được nghĩa vụ trả gốc TDH hằng năm hoặc khấu hao trong năm thì kết quả của LNST sử dụng để trả nghĩa vụ TDH sẽ bằng 0.
 
 ---
 

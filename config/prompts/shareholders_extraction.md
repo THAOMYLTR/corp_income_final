@@ -55,6 +55,8 @@ QUY TẮC RIÊNG:
   KHÔNG lấy "Đại diện TCB" (cán bộ ngân hàng) hay "Người đại diện theo PL".
   KHÔNG lấy người đại diện theo pháp luật của công ty, người quyết định chính hay người thân của KH
   (vợ/chồng/con…) nếu báo cáo không ghi họ là đại diện KH. Không có mục đó thì "".
+- [Instruction 12/11] Công ty TNHH MỘT THÀNH VIÊN hoặc DOANH NGHIỆP TƯ NHÂN: ĐKKD ghi "Chủ sở hữu" /
+  "Chủ doanh nghiệp" — ghi người / tổ chức đó là thành viên DUY NHẤT trong "members", "ownership_pct" = 100.
 - "beneficial_owner_notes": CHỈ từ báo cáo thực địa/RBO — ai là chủ thực sự,
   người đứng tên hộ... ghi đúng như cán bộ ghi nhận.
 

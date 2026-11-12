@@ -465,6 +465,16 @@ def _primary_member_record(recs):
     )
 
 
+SINGLE_OWNER_FORMS = ("tnhh mot thanh vien", "tnhh mtv", "doanh nghiep tu nhan", "dntn")
+
+
+def is_single_owner_form(company_name: Any) -> bool:
+    """[Instruction 12/11] Tên có "TNHH MỘT THÀNH VIÊN" / "TNHH MTV" / "DOANH NGHIỆP TƯ NHÂN" / "DNTN"."""
+
+    text = f" {normalize_text(str(company_name or ''))} "
+    return any(f" {form} " in text for form in SINGLE_OWNER_FORMS)
+
+
 def check_shareholders(records, as_of: date, watchlist, borrower_names: list[str]) -> dict[str, Any]:
     recs = _records(records, "shareholders")
     findings: list[Finding] = []
@@ -482,10 +492,17 @@ def check_shareholders(records, as_of: date, watchlist, borrower_names: list[str
         lb_capital, _ = _pick(_records(records, "legal_basic"), "charter_capital")
         charter = _num(lb_capital)
 
+    # [Instruction 12/11] Công ty TNHH một thành viên / doanh nghiệp tư nhân: chủ sở hữu / chủ doanh
+    # nghiệp ghi trên ĐKKD sở hữu 100% (ĐKKD thường không in tỷ lệ).
+    name, _ = _pick(_records(records, "legal_basic"), "company_name")
+    sole_owner = len(members) == 1 and is_single_owner_form(name)
+
     rows = []
     for member in members:
         pct = _num(member.get("ownership_pct"))
         pct_source = "như in"
+        if pct is None and sole_owner:
+            pct, pct_source = 100.0, "chủ sở hữu duy nhất (TNHH MTV / DNTN)"
         if pct is None and charter and _num(member.get("capital_amount")) is not None:
             pct = round(_num(member["capital_amount"]) / charter * 100, 2)
             pct_source = "tính toán"
