@@ -24,7 +24,8 @@ def _full_variants(full: str) -> list[str]:
     out too ("Ngân hàng Thương mại cổ phần …" is common on CIC)."""
 
     names = [re.sub(r"\(.*?\)", "", full)]
-    names += [f"Ngân hàng {m.strip()}" for m in re.findall(r"tên cũ:\s*([^)]+)", full)]
+    # [13/11] "(tên khác: …)" — cùng ngân hàng, thứ tự từ khác (VPBank: "Việt Nam Thịnh Vượng" / "Thịnh Vượng Việt Nam")
+    names += [f"Ngân hàng {m.strip()}" for m in re.findall(r"tên (?:cũ|khác):\s*([^)]+)", full)]
     out = []
     for name in names:
         key = normalize_text(name)

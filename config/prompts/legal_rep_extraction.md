@@ -28,6 +28,9 @@ QUY TẮC RIÊNG:
   ai là người tiếp xúc, ai quyết định kinh doanh, ai hiểu hoạt động và tài
   chính của DN. Ghi đúng như cán bộ ghi nhận.
 - KHÔNG đánh giá năng lực, kinh nghiệm của ban lãnh đạo (đã bỏ khỏi BRD).
+- [13/11] "name" là HỌ TÊN người / tên tổ chức, KHÔNG BAO GIỜ là chức danh. Văn bản chỉ ghi chức
+  danh ("Giám đốc", "Người đại diện theo pháp luật", "Chủ tịch HĐQT"…) mà không có họ tên thì KHÔNG
+  tạo phần tử đó — không điền chức danh vào "name".
 
 Trả về CHÍNH XÁC JSON sau, không thêm text:
 {

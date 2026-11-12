@@ -178,6 +178,73 @@ def norm_person(name: Any) -> str:
     return _strip_tokens(normalize_text(str(name or "")), _PERSON_TITLE_TOKENS)
 
 
+# [13/11] Chức danh mà LLM/OCR điền nhầm vào ô họ tên ("Giám đốc", "Người đại diện"…).
+_TITLE_ONLY_NAMES = {
+    "giam doc", "tong giam doc", "pho giam doc", "pho tong giam doc", "chu tich", "chu tich hdqt",
+    "chu tich hoi dong quan tri", "chu tich hdtv", "chu tich hoi dong thanh vien", "chu tich cong ty",
+    "ke toan truong", "ke toan", "thanh vien", "thanh vien gop von", "co dong", "co dong sang lap",
+    "chu so huu", "chu doanh nghiep", "nguoi dai dien", "nguoi dai dien theo phap luat",
+    "dai dien phap luat", "dai dien theo phap luat", "giam doc kiem nguoi dai dien theo phap luat",
+    "dai dien kh", "dai dien khach hang", "khach hang", "kh vay",
+}
+
+
+def is_title_not_name(name: Any) -> bool:
+    """[13/11] True when the "name" is only a job title — "Giám đốc", "Người đại diện theo PL"…"""
+
+    return norm_person(name) in _TITLE_ONLY_NAMES
+
+
+def same_person(a: Any, b: Any) -> bool:
+    """[13/11] Same person despite OCR slips in the SURNAME only ("PHAN QUANG ĐIỀN" = "PHẠM QUANG ĐIỆN").
+
+    Chỉ dùng cho hai tên ở HAI VĂN BẢN KHÁC NHAU (lỗi OCR giữa các nguồn). Trong cùng một văn bản,
+    "Phan Văn A" và "Phạm Văn A" là hai người — người gọi phải tự kiểm tra điều đó.
+
+    Accents are ignored. Middle and given names must be identical — "Nguyễn Thị Pha" ≠ "Nguyễn Thị Hà"
+    (one letter apart, two different people) — and the surnames may differ by at most one letter.
+    """
+
+    ta, tb = norm_person(a).split(), norm_person(b).split()
+    if not ta or not tb:
+        return False
+    if ta == tb:
+        return True
+    if len(ta) != len(tb) or len(ta) < 3 or ta[1:] != tb[1:]:
+        return False
+    sa, sb = ta[0], tb[0]
+    if len(sa) == len(sb):
+        return sum(x != y for x, y in zip(sa, sb)) <= 1
+    if abs(len(sa) - len(sb)) == 1:
+        short, long_ = sorted((sa, sb), key=len)
+        return any(long_[:i] + long_[i + 1:] == short for i in range(len(long_)))
+    return False
+
+
+def parse_pct(value: Any) -> float | None:
+    """[13/11] Tỷ lệ góp vốn as a number: 30, "30%", "7,5", "7,5 %", "0.075"→ kept as printed.
+
+    The extraction prompt asks for a number, but the model sometimes returns the text as printed;
+    ``_num`` rejected every string, so the ratio fell to None and showed as 0 in table 1b.
+    """
+
+    if isinstance(value, bool) or value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    text = str(value).strip().replace("%", "").replace(" ", "")
+    if not text:
+        return None
+    if "," in text and "." not in text:
+        text = text.replace(",", ".")                     # 7,5 → 7.5
+    elif "," in text and "." in text:
+        text = text.replace(".", "").replace(",", ".")    # 1.234,5 → 1234.5
+    try:
+        return float(text)
+    except ValueError:
+        return None
+
+
 def norm_tax_code(code: Any) -> str:
     return re.sub(r"[^0-9\-]", "", str(code or ""))
 
@@ -451,7 +518,28 @@ def check_legal_basic(records, as_of: date, watchlist) -> dict[str, Any]:
 _MEMBER_DOC_PRIORITY = ("so_dang_ky_co_dong", "gcn_dkdn", "tra_cuu_dkdn", "dieu_le", "quyet_dinh_bo_nhiem", "chuyen_nhuong_von")
 
 
-def _primary_member_record(recs):
+def _has_stake(member: dict) -> bool:
+    return parse_pct(member.get("ownership_pct")) is not None or _num(member.get("capital_amount")) is not None
+
+
+def _any_stake(record) -> bool:
+    return any(_has_stake(m) for m in record["data"].get("members") or [] if isinstance(m, dict))
+
+
+def _doc_date(record) -> date | None:
+    return parse_date(record["data"].get("document_date"))
+
+
+def _primary_member_record(recs, keep_priority: bool = False):
+    """Văn bản chính cho danh sách thành viên: theo thứ tự loại văn bản, mới nhất trước.
+
+    [Sửa 13/11] Văn bản KHÔNG có tỷ lệ / vốn góp của BẤT KỲ ai bị xếp sau văn bản có. Công ty cổ phần:
+    ĐKKD không in danh sách cổ đông, LLM đưa người đại diện vào "members" (không tỷ lệ) → trước đây văn
+    bản này thắng điều lệ và bảng 1b mất toàn bộ cổ đông, tỷ lệ. Chỉ cần ĐKKD có tỷ lệ / vốn góp của
+    MỘT người là vẫn giữ thứ tự cũ. ``keep_priority`` (TNHH MTV / DNTN): giữ nguyên thứ tự cũ — ĐKKD ghi
+    chủ sở hữu, 100% (Instruction 12/11).
+    """
+
     with_members = [r for r in recs if r["data"].get("members")]
     if not with_members:
         return None
@@ -459,10 +547,43 @@ def _primary_member_record(recs):
     return min(
         with_members,
         key=lambda r: (
+            0 if keep_priority or _any_stake(r) else 1,
             order.get(r.get("document_type"), 50),
-            -(parse_date(r["data"].get("document_date")) or date.min).toordinal(),
+            -(_doc_date(r) or date.min).toordinal(),
         ),
     )
+
+
+def _skipped_member_records(recs, primary) -> list:
+    """[13/11] Văn bản ưu tiên hơn văn bản chính nhưng bị bỏ qua vì không có tỷ lệ / vốn góp."""
+
+    order = {t: i for i, t in enumerate(_MEMBER_DOC_PRIORITY)}
+    rank = order.get(primary.get("document_type"), 50)
+    return [r for r in recs if r is not primary and r["data"].get("members") and not _any_stake(r)
+            and order.get(r.get("document_type"), 50) < rank]
+
+
+def _pct_elsewhere(recs, primary, name: Any) -> float | None:
+    """[13/11] Tỷ lệ của cùng người ở văn bản khác khi văn bản chính không in.
+
+    Không lấy từ văn bản CŨ HƠN văn bản chính (tỷ lệ có thể đã đổi do chuyển nhượng); không rõ ngày
+    thì vẫn lấy. Tên phải khớp chính xác (bỏ dấu) — không dùng khớp lệch họ ở đây.
+    """
+
+    order = {t: i for i, t in enumerate(_MEMBER_DOC_PRIORITY)}
+    primary_date = _doc_date(primary)
+    for record in sorted(recs, key=lambda r: order.get(r.get("document_type"), 50)):
+        if record is primary:
+            continue
+        other_date = _doc_date(record)
+        if primary_date and other_date and other_date < primary_date:
+            continue
+        for member in record["data"].get("members") or []:
+            if isinstance(member, dict) and norm_person(member.get("name")) == norm_person(name):
+                pct = parse_pct(member.get("ownership_pct"))
+                if pct is not None:
+                    return pct
+    return None
 
 
 SINGLE_OWNER_FORMS = ("tnhh mot thanh vien", "tnhh mtv", "doanh nghiep tu nhan", "dntn")
@@ -480,13 +601,16 @@ def check_shareholders(records, as_of: date, watchlist, borrower_names: list[str
     findings: list[Finding] = []
     add = lambda *a, **k: findings.append(Finding(2, *a, **k))
 
-    primary = _primary_member_record(recs)
+    # [Instruction 12/11] TNHH MTV / DNTN: chủ sở hữu ghi trên ĐKKD — giữ thứ tự văn bản cũ
+    company_name, _ = _pick(_records(records, "legal_basic"), "company_name")
+    primary = _primary_member_record(recs, keep_priority=is_single_owner_form(company_name))
     if primary is None:
         add("no_members", "alert", "Không trích xuất được danh sách cổ đông/thành viên góp vốn")
         return {"summary": {"members": []}, "findings": findings, "conclusion": _conclude(findings, "")}
 
     data = primary["data"]
-    members = [m for m in data.get("members") or [] if isinstance(m, dict)]
+    # [13/11] bỏ dòng mà "tên" chỉ là chức danh ("Giám đốc")
+    members = [m for m in data.get("members") or [] if isinstance(m, dict) and not is_title_not_name(m.get("name"))]
     charter = _num(data.get("charter_capital"))
     if charter is None:
         lb_capital, _ = _pick(_records(records, "legal_basic"), "charter_capital")
@@ -494,13 +618,29 @@ def check_shareholders(records, as_of: date, watchlist, borrower_names: list[str
 
     # [Instruction 12/11] Công ty TNHH một thành viên / doanh nghiệp tư nhân: chủ sở hữu / chủ doanh
     # nghiệp ghi trên ĐKKD sở hữu 100% (ĐKKD thường không in tỷ lệ).
-    name, _ = _pick(_records(records, "legal_basic"), "company_name")
-    sole_owner = len(members) == 1 and is_single_owner_form(name)
+    sole_owner = len(members) == 1 and is_single_owner_form(company_name)
+
+    # [13/11] Danh sách lấy từ văn bản thứ yếu vì văn bản ưu tiên (ĐKKD / sổ cổ đông) không có tỷ lệ:
+    # cảnh báo khi văn bản được dùng CŨ HƠN hoặc không rõ ngày — có thể đã chuyển nhượng sau đó.
+    primary_date = _doc_date(primary)
+    for skipped in _skipped_member_records(recs, primary):
+        skipped_date = _doc_date(skipped)
+        if primary_date and skipped_date and skipped_date <= primary_date:
+            continue
+        when = (f" ({primary['data'].get('document_date')})" if primary_date else " (không rõ ngày)")
+        add("members_from_older_doc", "warning",
+            f"Danh sách thành viên/tỷ lệ góp vốn lấy từ {primary.get('document', '?')}{when} vì "
+            f"{skipped.get('document', '?')} không ghi tỷ lệ/vốn góp — kiểm tra chuyển nhượng sau ngày văn bản",
+            [_cite(primary), _cite(skipped)])
 
     rows = []
     for member in members:
-        pct = _num(member.get("ownership_pct"))
+        pct = parse_pct(member.get("ownership_pct"))       # [13/11] nhận cả "30%", "7,5"
         pct_source = "như in"
+        if pct is None:
+            pct = _pct_elsewhere(recs, primary, member.get("name"))
+            if pct is not None:
+                pct_source = "như in (văn bản khác)"
         if pct is None and sole_owner:
             pct, pct_source = 100.0, "chủ sở hữu duy nhất (TNHH MTV / DNTN)"
         if pct is None and charter and _num(member.get("capital_amount")) is not None:
@@ -642,8 +782,14 @@ def check_legal_rep(records, as_of: date, watchlist) -> dict[str, Any]:
         for rep in record["data"].get("legal_representatives") or []:
             rep = rep if isinstance(rep, dict) else {"name": rep}
             key = norm_person(rep.get("name"))
-            if key and key not in current:
-                current[key] = {**rep, "source": _cite(record)}
+            # [13/11] bỏ "tên" chỉ là chức danh; gộp tên lệch họ do OCR (PHAN / PHẠM QUANG ĐIỀN) — CHỈ khi hai
+            # tên ở hai văn bản khác nhau; cùng một văn bản thì là hai người.
+            if not key or is_title_not_name(rep.get("name")):
+                continue
+            cite = _cite(record)
+            if key not in current and not any(same_person(key, k) and v["source"] != cite
+                                              for k, v in current.items()):
+                current[key] = {**rep, "source": cite}
 
     if not current:
         add("no_rep", "alert", "Không xác định được người đại diện theo pháp luật")
