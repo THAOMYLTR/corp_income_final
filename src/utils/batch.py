@@ -12,7 +12,7 @@ Notebook (cell "Chạy nhiều case"):
 - One case failing does not stop the others: the error is written to its row of the summary.
 - ``per_case`` = {case_id: {...}} overrides the shared settings for one case, e.g.
   {"case_3": {"borrower_names": ["Nguyễn Văn A"], "annual_lt_principal": 5e9}}.
-- ``save_run`` writes the same files as the single-case cell (final_response.md / .pdf,
+- ``save_run`` writes the same files as the single-case cell (final_response_<case_id>.md / .pdf,
   corp_income.json / .xlsx, *_extraction.json, ocr/, result.json).
 """
 
@@ -39,14 +39,18 @@ def _write_json(path: Path, content: Any) -> None:
     path.write_text(json.dumps(content, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
 
 
-def save_run(result: dict[str, Any], run_dir: Path) -> Path:
-    """Write every output file of one case into ``run_dir``; returns ``run_dir``."""
+def save_run(result: dict[str, Any], run_dir: Path, case_id: str = "") -> Path:
+    """Write every output file of one case into ``run_dir``; returns ``run_dir``.
+
+    [12/11] ``case_id`` goes into the report file names: final_response_<case_id>.pdf / .md.
+    """
 
     from src.utils.report.excel_export import write_excel
     from src.utils.report.visualization.report_html import embed_diagrams
 
     run_dir.mkdir(parents=True, exist_ok=True)
-    (run_dir / "final_response.md").write_text(embed_diagrams(result.get("response") or ""), encoding="utf-8")
+    report = f"final_response_{case_id}" if case_id else "final_response"
+    (run_dir / f"{report}.md").write_text(embed_diagrams(result.get("response") or ""), encoding="utf-8")
     docs = result.get("document_classifications") or []
     for key in OWN_FILES:
         _write_json(run_dir / f"{key}.json", result.get(key))
@@ -67,7 +71,7 @@ def save_run(result: dict[str, Any], run_dir: Path) -> Path:
         from weasyprint import HTML
         from src.utils.report.visualization.report_html import build_report_html
 
-        HTML(string=build_report_html(result.get("response") or "")).write_pdf(str(run_dir / "final_response.pdf"))
+        HTML(string=build_report_html(result.get("response") or "")).write_pdf(str(run_dir / f"{report}.pdf"))
     except (ImportError, OSError) as exc:
         print(f"  Bỏ qua PDF ({type(exc).__name__}: {exc})")
     return run_dir
@@ -106,7 +110,7 @@ def run_cases(supervisor: Any, case_ids: list[str], samples_dir: Path, output_di
             settings = {**shared, **(per_case or {}).get(case_id, {})}
             inputs = settings.pop("input_paths", None) or [str(Path(samples_dir) / case_id)]
             result = supervisor.process(inputs, **settings)
-            run_dir = save_run(result, Path(output_dir) / f"{case_id}_{datetime.now():%Y%m%d_%H%M%S}")
+            run_dir = save_run(result, Path(output_dir) / f"{case_id}_{datetime.now():%Y%m%d_%H%M%S}", case_id)
             group = ((result.get("corp_income") or {}).get("corp_group") or {}).get("group", "")
             failed = failed_extractions(result)
             row.update({"status": "OK" if not failed else "THIẾU TRÍCH XUẤT",
