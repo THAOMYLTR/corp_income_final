@@ -34,7 +34,7 @@ Không gộp được: tên OCR sai cả tên đệm / tên (vd "Quang Quên") �
 
 | Mục | Trước (05/11, 10/11) | Nay (13/11) | File |
 |---|---|---|---|
-| Chất lượng lợi nhuận (nhận xét 3b) | (LN khác + DT tài chính) / LNTT: < 25% tốt, 25–< 50% trung bình, ≥ 50% kém | **LN gộp / LNTT**: > 85% tốt; 50%–85% trung bình; < 50% kém. LNTT ≤ 0 hoặc thiếu LN gộp → không nhận xét | `financial_metrics.earnings_quality_remark` |
+| Chất lượng lợi nhuận (nhận xét 3b) | (LN khác + DT tài chính) / LNTT: < 25% tốt, 25–< 50% trung bình, ≥ 50% kém | **[Cập nhật 13/11 tối] Giữ công thức cũ** theo bản cập nhật template: (Lợi nhuận khác + DT hoạt động tài chính) ÷ LNTT; < 25% tốt; 25% – < 50% trung bình; ≥ 50% kém; < 0 → không nhận xét. (Bản LN gộp / LNTT buổi sáng đã bỏ.) | `financial_metrics.earnings_quality_remark`, ghi chú đầu `corp-income-structure.md` |
 | Lệch thông tin pháp lý | Chỉ cảnh báo ở 1b | **Bad corp**: MST, tên DN, địa chỉ TSC, NĐDPL, ngày thành lập không khớp giữa các chứng từ (vẫn cảnh báo ở 1b) | `appendix_context.corp_group` (`LEGAL_MISMATCH_CODES`), `config/prompts/credit_assessment.md`, `corp-income-cell-specs.md` |
 | Bảng 3a — cột % | Một cột % Tỷ trọng (năm N-1) | **Mỗi năm một cột**: Chỉ tiêu · N-2 · % Tỷ trọng · N-1 · % Tỷ trọng · Nhận xét | `corp-income-structure.md`, `appendix_context` (RowsCoCau), `report_style.py` (độ rộng cột 5) |
 | Nhận xét 3a | Phù hợp ngành (bảng phân bổ) → HSTT → cảnh báo BCTC | **HSTT → cảnh báo BCTC** (bỏ nhận xét phù hợp ngành) | `appendix_context` |

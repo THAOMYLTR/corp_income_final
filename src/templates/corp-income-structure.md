@@ -14,6 +14,8 @@ Who fills what:
   "- Nhà xưởng: …" / "- Kho hàng: …" lines — only when the dossier has that address;
   {{CanhBaoPhapLy}}, {{NhanXetHDKD}} lines — only when there is something to warn about;
   class="pakd" tables — only with a business plan, else the class="no-pakd" sentence.
+- [13/11] Nhận xét 3b — Chất lượng lợi nhuận = (Lợi nhuận khác + Doanh thu hoạt động tài chính) ÷ LNTT
+  (financial_metrics.earnings_quality_remark): < 25% tốt; 25% – < 50% trung bình; ≥ 50% kém; < 0 → không nhận xét.
 -->
 ## PHỤ LỤC 01 - THẨM ĐỊNH NGUỒN THU DOANH NGHIỆP
 
