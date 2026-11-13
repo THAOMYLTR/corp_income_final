@@ -103,6 +103,18 @@ class Update1311Test(unittest.TestCase):
         self.assertEqual(short_name("NGÂN HÀNG TMCP THỊNH VƯỢNG VIỆT NAM"), "VPBank")
         self.assertEqual(short_name("Ngân hàng TMCP Thịnh vượng và Phát triển"), "PG Bank")
 
+    def test_saigon_banks_are_not_scb_by_prefix(self):
+        # [Sửa 13/11] "Ngân hàng TMCP Sài Gòn" (SCB) is only the start of these names
+        cases = {"Ngân hàng TMCP Sài Gòn Tài Lộc": "Sacombank",
+                 "NGÂN HÀNG TMCP SÀI GÒN TÀI LỘC - CN BẾN THÀNH": "Sacombank",
+                 "Ngân hàng TMCP Sài Gòn Thương Tín - CN Q3": "Sacombank",
+                 "Ngân hàng TMCP Sài Gòn Công Thương": "Saigonbank", "Ngân hàng TMCP Sài Gòn - Hà Nội": "SHB",
+                 "Ngân hàng TMCP Sài Gòn": "SCB", "NH TMCP Sài Gòn - Chi nhánh Q1": "SCB",
+                 "Ngân hàng TMCP Sài Gòn - PGD Bến Thành": "SCB", "Ngân hàng TMCP Sài Gòn (SCB) - Sở giao dịch": "SCB",
+                 "Ngân hàng TMCP Sài Gòn Mới Lạ": "Ngân hàng TMCP Sài Gòn Mới Lạ"}     # not in the table: as written
+        for name, short in cases.items():
+            self.assertEqual(short_name(name), short, name)
+
 
 class Tighten1311Test(unittest.TestCase):
     """[13/11] 3 điểm siết: không đổi logic cũ khi không cần, không gộp nhầm hai người thật."""

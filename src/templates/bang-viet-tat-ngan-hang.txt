@@ -24,7 +24,7 @@ OceanBank: Ngân hàng Thương mại TNHH MTV Đại Dương
 OCB: Ngân hàng TMCP Phương Đông
 PG Bank(PGB): Ngân hàng TMCP Thịnh vượng và Phát triển (tên cũ: TMCP Xăng dầu Petrolimex)
 PVcomBank: Ngân hàng TMCP Đại Chúng Việt Nam
-Sacombank(STB): Ngân hàng TMCP Sài Gòn Thương Tín
+Sacombank(STB): Ngân hàng TMCP Sài Gòn Thương Tín (tên khác: TMCP Sài Gòn Tài Lộc)
 Saigonbank(SGB): Ngân hàng TMCP Sài Gòn Công Thương
 SCB: Ngân hàng TMCP Sài Gòn
 SeABank(SSB): Ngân hàng TMCP Đông Nam Á

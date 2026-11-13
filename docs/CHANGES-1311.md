@@ -9,6 +9,8 @@ sơ: các thay đổi là luật chung, trừ dòng VPBank là sửa dữ liệu
 |---|---|---|
 | Bảng viết tắt ghi "Ngân hàng TMCP **Thịnh Vượng Việt Nam**", CIC ghi "**Việt Nam Thịnh Vượng**" → khác thứ tự từ, không khớp. Lỗi theo hồ sơ (case nào có VPBank), không do LLM. | Sửa dòng VPBank (tên đúng + `(tên khác: …)`); code nhận `(tên khác: …)` như `(tên cũ: …)`. | Không. Cách khớp giữ nguyên. |
 
+| Sacombank ghi "Sài Gòn Tài Lộc" bị hiện thành **SCB**: tên này không có trong bảng, mà tên đầy đủ của SCB ("Ngân hàng TMCP Sài Gòn") lại là phần đầu của nó. | (1) Dòng Sacombank thêm `(tên khác: TMCP Sài Gòn Tài Lộc)`. (2) Luật chung: tên đầy đủ là phần đầu tên ngân hàng khác (hiện chỉ có SCB) chỉ khớp khi sau đó là hết tên, từ chi nhánh (CN, PGD, Sở giao dịch…) hoặc mã của chính nó (SCB). Tên "Sài Gòn …" lạ → hiện đúng như CIC ghi, không gộp vào SCB. | Có — chỉ với SCB. Các ngân hàng khác khớp như cũ. |
+
 ## 2. Bảng 1b — tỷ lệ góp vốn = 0 dù OCR đọc được
 
 | Nguyên nhân | Sửa | Đổi logic cũ? |
@@ -49,8 +51,8 @@ Test sửa theo: `test_display_2910.py` (chất lượng lợi nhuận), `test_c
 |---|---|---|
 | `src/agents/calculator/legal_checks.py` | Hàm mới: `is_title_not_name`, `same_person`, `parse_pct`, `_has_stake`, `_any_stake`, `_doc_date`, `_skipped_member_records`, `_pct_elsewhere`. Sửa: `_primary_member_record` (thêm `keep_priority`), `check_shareholders` (chọn văn bản, bù tỷ lệ, cảnh báo `members_from_older_doc`), `check_legal_rep` (bỏ chức danh, gộp lệch họ khác văn bản). | File lớn nhất; chép cả các hàm mới (đặt ngay trên `norm_tax_code` và trên `SINGLE_OWNER_FORMS`). |
 | `src/utils/report/appendix_context.py` | Import thêm `_cite as cite_record`, `is_title_not_name`, `same_person`. `_field_people` (bỏ chức danh, lưu `_doc`). Khối 1b: `match` / `is_seen` theo văn bản, `person_row` có thêm tham số `doc`, "—" cho thành viên chưa rõ tỷ lệ, đánh dấu (*) chính xác trước. Thêm `members_from_older_doc` vào 2 danh sách mã cảnh báo. | `person_row` đổi chữ ký hàm — sửa cả 3 chỗ gọi. |
-| `src/agents/calculator/banks.py` | `_full_variants`: regex `tên (?:cũ|khác):`. | 1 dòng. |
-| `src/templates/bang-viet-tat-ngan-hang.txt` | Dòng VPBank + chú thích đầu file. | Thêm ngân hàng mới: tên đầy đủ phải đúng thứ tự từ như CIC ghi. |
+| `src/agents/calculator/banks.py` | `_full_variants`: regex `tên (?:cũ|khác):`. Thêm `BRANCH_WORDS`, `_prefix_names`, `_ends_name`; `short_name` bước 1 gọi `_ends_name`. | Chép cả file. |
+| `src/templates/bang-viet-tat-ngan-hang.txt` | Dòng VPBank, dòng Sacombank (tên khác: Sài Gòn Tài Lộc) + chú thích đầu file. | Thêm ngân hàng mới: tên đầy đủ phải đúng thứ tự từ như CIC ghi. |
 | `config/prompts/shareholders_extraction.md` | Luật `ownership_pct` là số; luật `members`; luật `name` không là chức danh. | Đổi prompt → kết quả LLM có thể khác lần chạy trước; chạy lại vài case cũ để so. |
 | `config/prompts/legal_rep_extraction.md` | Luật `name` không là chức danh. | |
 | `testing/test_display_1311.py` (mới) | 16 test: 2 hồ sơ lỗi + các trường hợp rủi ro (ĐKKD có tỷ lệ giữ thứ tự cũ, ĐKKD mới hơn điều lệ → cảnh báo, không bù tỷ lệ từ văn bản cũ, TNHH MTV, Phan/Phạm cùng văn bản là hai người, (*) đúng người). | Không cần chép nếu Databricks không chạy test. |
