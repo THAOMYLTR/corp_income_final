@@ -79,6 +79,7 @@ td.layout-side {{ width: 42%; }}
    cả 5 cột (dù tổng 98%) vẫn đẩy cột cuối ra ngoài mép trang. Hai bảng cùng mục dùng cùng số → thẳng hàng. */
 table.fin th:nth-child(1) {{ width: 17%; }}
 table.fin th:nth-child(2), table.fin th:nth-child(3), table.fin th:nth-child(4) {{ width: 11%; }}
+table.fin th:nth-child(5):not(:last-child) {{ width: 11%; }}  /* [13/11] 3a: cột % Tỷ trọng năm N-1 */
 table.pakd th:nth-child(1) {{ width: 18%; }}
 table.pakd th:nth-child(2), table.pakd th:nth-child(3) {{ width: 16%; }}
 table.pakd th:nth-child(4) {{ width: 12%; }}

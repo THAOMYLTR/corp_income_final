@@ -72,7 +72,7 @@ Who fills what:
 #### a. Cơ cấu tài sản, nguồn vốn
 
 <table class="fin">
-<tr><th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th><th>Nhận xét</th></tr>
+<tr><th>Chỉ tiêu</th><th>{{Nam-2}}</th><th>% Tỷ trọng</th><th>{{Nam-1}}</th><th>% Tỷ trọng</th><th>Nhận xét</th></tr>
 {{RowsCoCau}}
 </table>
 

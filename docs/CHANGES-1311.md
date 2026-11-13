@@ -1,4 +1,4 @@
-# Thay đổi 13/11/2026 — lỗi bảng 1b và bảng 4a khi chạy nhiều case
+# Thay đổi 13/11/2026 — lỗi bảng 1b, 4a khi chạy nhiều case; 4 chỗ đổi theo Instruction / Template final
 
 Mọi chỗ sửa trong code có comment `[13/11]` hoặc `[Sửa 13/11]`. Không có giá trị nào gắn cứng cho một hồ
 sơ: các thay đổi là luật chung, trừ dòng VPBank là sửa dữ liệu trong bảng viết tắt.
@@ -27,6 +27,21 @@ sơ: các thay đổi là luật chung, trừ dòng VPBank là sửa dữ liệu
 | OCR sai họ: "PHAN QUANG ĐIỀN" / "PHẠM QUANG ĐIỀN" → 2 dòng. | `same_person`: bỏ dấu; tên đệm + tên giống hệt, họ lệch tối đa 1 chữ. **Luật 2 (đã siết):** chỉ gộp khi hai tên ở **hai văn bản khác nhau**; cùng một văn bản → hai người. Đánh dấu (*): khớp chính xác người vay trước, chỉ xét lệch họ khi không ai khớp chính xác. | Có — trước đây chỉ khớp chính xác. |
 
 Không gộp được: tên OCR sai cả tên đệm / tên (vd "Quang Quên") — cố ý, vì dễ gộp nhầm hai người; cần kiểm tra tay.
+
+## 4. Đổi theo Instruction final / Template final (4 chỗ trước đây giữ quyết định cũ)
+
+| Mục | Trước (05/11, 10/11) | Nay (13/11) | File |
+|---|---|---|---|
+| Chất lượng lợi nhuận (nhận xét 3b) | (LN khác + DT tài chính) / LNTT: < 25% tốt, 25–< 50% trung bình, ≥ 50% kém | **LN gộp / LNTT**: > 85% tốt; 50%–85% trung bình; < 50% kém. LNTT ≤ 0 hoặc thiếu LN gộp → không nhận xét | `financial_metrics.earnings_quality_remark` |
+| Lệch thông tin pháp lý | Chỉ cảnh báo ở 1b | **Bad corp**: MST, tên DN, địa chỉ TSC, NĐDPL, ngày thành lập không khớp giữa các chứng từ (vẫn cảnh báo ở 1b) | `appendix_context.corp_group` (`LEGAL_MISMATCH_CODES`), `config/prompts/credit_assessment.md`, `corp-income-cell-specs.md` |
+| Bảng 3a — cột % | Một cột % Tỷ trọng (năm N-1) | **Mỗi năm một cột**: Chỉ tiêu · N-2 · % Tỷ trọng · N-1 · % Tỷ trọng · Nhận xét | `corp-income-structure.md`, `appendix_context` (RowsCoCau), `report_style.py` (độ rộng cột 5) |
+| Nhận xét 3a | Phù hợp ngành (bảng phân bổ) → HSTT → cảnh báo BCTC | **HSTT → cảnh báo BCTC** (bỏ nhận xét phù hợp ngành) | `appendix_context` |
+
+Giữ nguyên: cảnh báo "(thu nhập khác + DT tài chính) / LNTT > 20%" trong trạng thái tài chính (Instruction final mục 3).
+Hàm `industry_fit_remark` và `bang-phan-bo-nganh.csv` vẫn còn trong code nhưng không hiện trên báo cáo.
+
+Test sửa theo: `test_display_2910.py` (chất lượng lợi nhuận), `test_corp_income_workflow.py` (lệch MST → Bad corp),
+`test_brd_2710.py` (tiêu đề bảng 3a).
 
 ## Lưu ý theo file (để chép sang Databricks)
 

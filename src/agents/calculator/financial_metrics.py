@@ -551,24 +551,21 @@ def industry_fit_remark(financials: dict[str, Any], allocation: dict[str, Any] |
 
 
 def earnings_quality_remark(financials: dict[str, Any]) -> str:
-    """[Template 10/11] Chất lượng lợi nhuận = (Lợi nhuận khác + Doanh thu hoạt động tài chính) / LNTT.
+    """[Template final 13/11] Chất lượng lợi nhuận = Lợi nhuận gộp về bán hàng và cung cấp dịch vụ / LNTT.
 
-    < 25% tốt (cốt lõi); 25% – < 50% trung bình; ≥ 50% kém. Kết quả < 0 (hoặc không tính được) →
-    không nhận xét ('').
+    > 85% tốt (cốt lõi); 50% – 85% trung bình; < 50% kém. LNTT ≤ 0 hoặc thiếu LN gộp → không nhận xét ('').
     """
 
     year = financials.get("latest_year")
     fig = (financials["years"].get(year) or {}) if year else {}
-    other_profit, fin_income, lntt = fig.get("other_profit"), fig.get("financial_income"), fig.get("profit_before_tax")
-    if not lntt or (other_profit is None and fin_income is None):
+    gross, lntt = fig.get("gross_profit"), fig.get("profit_before_tax")
+    if gross is None or not lntt or lntt <= 0:
         return ""
-    ratio = ((other_profit or 0) + (fin_income or 0)) / lntt
-    if ratio < 0:
-        return ""
-    text = (f"Chất lượng lợi nhuận năm {year} ((LN khác + DT hoạt động tài chính) / LNTT) = {pct(ratio)} — ")
-    if ratio < 0.25:
+    ratio = gross / lntt
+    text = f"Chất lượng lợi nhuận năm {year} (LN gộp / LNTT) = {pct(ratio)} — "
+    if ratio > 0.85:
         return text + "Chất lượng lợi nhuận tốt đến từ hoạt động kinh doanh cốt lõi"
-    if ratio < 0.50:
+    if ratio >= 0.50:
         return text + "Chất lượng lợi nhuận trung bình, một phần lợi nhuận không đến từ hoạt động kinh doanh cốt lõi"
     return text + "Chất lượng lợi nhuận kém, lợi nhuận không đến từ hoạt động kinh doanh cốt lõi"
 

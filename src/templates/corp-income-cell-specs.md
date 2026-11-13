@@ -61,7 +61,7 @@ Sử dụng có điều kiện; Good corp và không còn rủi ro trung bình t
 **Đề xuất: <Sử dụng / Sử dụng có điều kiện / Không sử dụng> nguồn thu doanh nghiệp để đánh giá năng lực trả nợ lần này.**
 **Lý do:** tối đa 3 gạch đầu dòng, mỗi dòng dưới 20 từ, có số liệu — nêu cơ sở pháp lý, tài chính, tín dụng (và PAKD có
 cơ sở hay không, nếu có PAKD). Bad corp: nêu đúng tiêu chí trong "phan_nhom_doanh_nghiep" (DN không hoạt động theo tra cứu
-thuế; thành lập < 12 tháng tính từ ngày đăng ký lần đầu; ngành nghề thực tế không phù hợp chứng từ; DN không hoạt động theo
+thuế; thông tin pháp lý không phù hợp giữa các chứng từ; thành lập < 12 tháng tính từ ngày đăng ký lần đầu; ngành nghề thực tế không phù hợp chứng từ; DN không hoạt động theo
 thẩm định thực tế; Bad finance; Bad bureau).
 **Điều kiện:** (chỉ khi "Sử dụng có điều kiện") tối đa 2 gạch đầu dòng — việc phải hoàn tất trước giải ngân.
 **Hồ sơ cần bổ sung:** (chỉ khi thiếu tài liệu quan trọng) tối đa 2 gạch đầu dòng, cụ thể, làm được ngay.

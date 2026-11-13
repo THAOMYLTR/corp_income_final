@@ -27,9 +27,7 @@
 
 Cách chạy: cell 1 → 8 (thông số, config, kiểm tra model, import) → cell Run → (tuỳ chọn) cell xem một case.
 
-## Giữ nguyên theo các quyết định trước (Template final ghi khác — chờ xác nhận)
-- Chất lượng lợi nhuận = (LN khác + DT TC) / LNTT, ngưỡng 25% / 50% (10/11).
-- Lệch thông tin pháp lý không làm Bad corp (05/11).
-- Bảng 3a một cột % Tỷ trọng (05/11); vẫn có nhận xét phù hợp ngành ở 3a.
+## Bốn chỗ Template final ghi khác quyết định trước
+Đã đổi theo file mới ngày 13/11 — xem `docs/CHANGES-1311.md`.
 
 Test: `testing/test_display_2910.py` (Update1211Test).

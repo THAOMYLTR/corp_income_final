@@ -25,7 +25,6 @@ from datetime import date
 from typing import Any
 
 from src.agents.calculator import business_model, cic_metrics
-from src.agents.calculator import industry as industry_table
 from src.utils.report.visualization.debt_chart import debt_chart
 from src.agents.calculator import financial_metrics as fm
 from src.agents.calculator.legal_checks import _cite as cite_record
@@ -276,6 +275,10 @@ def first_registration(records: list[dict], items: dict | None = None) -> date |
     return min(dates) if dates else None
 
 
+LEGAL_MISMATCH_CODES = ("tax_code_mismatch", "name_mismatch", "address_mismatch", "rep_mismatch",
+                        "establishment_mismatch")
+
+
 def corp_group(items: dict, financials: dict, cic: dict, as_of: date,
                records: list[dict] | None = None) -> dict[str, Any]:
     """Bad corp if ANY criterion; Good corp if Good finance AND Good bureau; else Normal."""
@@ -284,7 +287,11 @@ def corp_group(items: dict, financials: dict, cic: dict, as_of: date,
     bad: list[str] = []
     if "status_not_active" in codes:
         bad.append("Pháp lý: " + codes["status_not_active"]["message"])
-    # [Guidance 05/11] lệch thông tin pháp lý giữa các nguồn chỉ là cảnh báo (mục 1b), không còn là Bad corp
+    # [Guidance final 13/11] thông tin pháp lý không phù hợp giữa các chứng từ (MST, tên, TSC, NĐDPL,
+    # năm thành lập) → Bad corp
+    for code in LEGAL_MISMATCH_CODES:
+        if code in codes:
+            bad.append("Pháp lý: " + codes[code]["message"])
     founded = first_registration(records or [], items)          # [05/11] ngày đăng ký lần đầu
     if founded and (as_of - founded).days < 365:
         bad.append(f"Pháp lý: thời gian thành lập dưới 12 tháng (thành lập {founded:%d/%m/%Y})")
@@ -491,17 +498,17 @@ def build_appendix_context(result: dict[str, Any], records: list[dict[str, Any]]
         return fm.pct(value / total) if value is not None and total else "—"
 
     lines = [("Tổng tài sản", "total_assets")] + fm.asset_lines(financials, (n2, n1))
-    # [Template 05/11] Nhận xét 3a, đúng thứ tự: (1) phù hợp ngành (bảng phân bổ ngành nghề),
-    # (2) hệ số thanh toán hiện hành, (3) cảnh báo dấu hiệu bất thường BCTC (nếu có).
-    allocation = industry_table.allocation(industry.get("business_group")) if industry else None
-    remarks = [x for x in (fm.industry_fit_remark(financials, allocation), fm.current_ratio_remark(financials)) if x]
+    # [Template final 13/11] Nhận xét 3a, đúng thứ tự: (1) hệ số thanh toán hiện hành,
+    # (2) cảnh báo dấu hiệu bất thường BCTC (nếu có). Không còn nhận xét phù hợp ngành.
+    remarks = [x for x in (fm.current_ratio_remark(financials),) if x]
     remarks += [f"⚠ {w}" for w in financials["bs_warnings"]]
     remarks = remarks or ["Chưa có bảng cân đối kế toán để đánh giá"]
     # [05/11] last row: hệ số thanh toán hiện hành của từng năm (no "% Tỷ trọng")
     ratio = lambda year: _ratio_text("current_ratio", (financials["ratios"].get(year) or {}).get("current_ratio"))
-    cell_rows = [[label, fm.fmt(fm.asset_value(f2, field)), fm.fmt(fm.asset_value(f1, field)),
-                  share(f1, fm.asset_value(f1, field))] for label, field in lines]   # one "% Tỷ trọng": năm N-1
-    cell_rows.append(["Hệ số TT hiện hành", ratio(n2), ratio(n1), ""])
+    # [Template final 13/11] mỗi năm một cột "% Tỷ trọng": N-2 | % | N-1 | %
+    cell_rows = [[label, fm.fmt(fm.asset_value(f2, field)), share(f2, fm.asset_value(f2, field)),
+                  fm.fmt(fm.asset_value(f1, field)), share(f1, fm.asset_value(f1, field))] for label, field in lines]
+    cell_rows.append(["Hệ số TT hiện hành", ratio(n2), "", ratio(n1), ""])
     rows = [_html_cells(cells) + (_html_cell(_html_lines(remarks), rowspan=len(cell_rows)) if i == 0 else "")
             for i, cells in enumerate(cell_rows)]
     ctx["RowsCoCau"] = "\n".join(f"<tr>{r}</tr>" for r in rows)

@@ -141,14 +141,16 @@ class Template0511Test(unittest.TestCase):
         self.assertEqual(fm.industry_fit_remark(fit, None), "")
 
     def test_earnings_quality_and_ros_vs_industry(self):
-        # [10/11] (LN khác + DT tài chính) / LNTT: < 25% tốt, 25–< 50% trung bình, ≥ 50% kém, < 0 → no remark
-        q = lambda other, fin_inc, lntt: fm.earnings_quality_remark(
-            self.fin(other_profit=other, financial_income=fin_inc, profit_before_tax=lntt))
-        self.assertIn("tốt đến từ hoạt động kinh doanh cốt lõi", q(10, 10, 100))         # 20%
-        self.assertIn("trung bình", q(20, 5, 100))                                      # 25%
-        self.assertIn("kém", q(30, 20, 100))                                             # 50%
-        self.assertEqual(q(-30, 5, 100), "")                                             # < 0
-        self.assertEqual(q(10, 10, 0), "")
+        # [Template final 13/11] LN gộp / LNTT: > 85% tốt, 50–85% trung bình, < 50% kém; LNTT ≤ 0 → no remark
+        q = lambda gross, lntt: fm.earnings_quality_remark(self.fin(gross_profit=gross, profit_before_tax=lntt))
+        self.assertIn("tốt đến từ hoạt động kinh doanh cốt lõi", q(90, 100))            # 90%
+        self.assertIn("trung bình", q(85, 100))                                          # 85%
+        self.assertIn("trung bình", q(50, 100))                                          # 50%
+        self.assertIn("kém", q(40, 100))                                                 # 40%
+        self.assertIn("(LN gộp / LNTT)", q(90, 100))
+        self.assertEqual(q(90, 0), "")
+        self.assertEqual(q(90, -10), "")
+        self.assertEqual(q(None, 100), "")
         f = fm.compute([fin([Y2025, Y2024])], AS_OF)
         ros = f["ratios"][f["latest_year"]]["ros"]
         self.assertIn(" phù hợp", fm.ros_vs_industry_remark(f, ros - 0.01))

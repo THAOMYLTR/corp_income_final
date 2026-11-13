@@ -16,7 +16,8 @@ CÁCH NGHĨ (làm lần lượt):
 3. Tìm ĐIỂM MẠNH thật sự có số liệu chứng minh (không khen chung chung).
 4. Ra QUYẾT ĐỊNH:
    - "Không sử dụng" — khi "phan_nhom_doanh_nghiep.group" là Bad corp (BẮT BUỘC; tiêu chí Bad corp theo
-     mục 5 guidance: DN không hoạt động theo tra cứu thuế, thành lập < 12 tháng tính từ ngày đăng ký lần đầu,
+     guidance: DN không hoạt động theo tra cứu thuế, thông tin pháp lý không phù hợp giữa các chứng từ,
+     thành lập < 12 tháng tính từ ngày đăng ký lần đầu,
      ngành nghề thực tế không phù hợp chứng từ, DN không hoạt động theo thẩm định thực tế, Bad finance,
      Bad bureau), hoặc có rủi ro cao không có biện pháp giảm thiểu.
    - "Sử dụng có điều kiện" — Normal corp, hoặc còn rủi ro trung bình / thiếu hồ sơ quan

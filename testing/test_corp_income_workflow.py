@@ -244,8 +244,9 @@ class AppendixTemplateTest(CorpIncomeWorkflowTest):
                           "KetLuan", "TCB_ST"):
             self.assertNotIn(code_cell, meta["llm_placeholders"])
         evidence = json.loads(self.writer_payloads[0]["evidence"])
-        # [Guidance 05/11] an MST mismatch is a 1b warning, no longer Bad corp
-        self.assertNotEqual(evidence["phan_nhom_doanh_nghiep"]["group"], "Bad corp")
+        # [Guidance final 13/11] thông tin pháp lý không phù hợp giữa các chứng từ (here: MST) → Bad corp
+        self.assertEqual(evidence["phan_nhom_doanh_nghiep"]["group"], "Bad corp")
+        self.assertTrue(any("MST" in r for r in evidence["phan_nhom_doanh_nghiep"]["bad_reasons"]))
         self.assertIn("VAT01.2025.txt", {e["file"] for e in evidence["trich_doan_ho_so"]})
         report = self.result["response"]
         self.assertIn("LLM:NhanXetHDKD", report)
