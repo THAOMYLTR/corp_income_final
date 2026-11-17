@@ -112,10 +112,10 @@ Khách hàng được phân loại **Bad Corp** khi thuộc ít nhất một tro
 
 - **Pháp lý doanh nghiệp:**
   - Doanh nghiệp không hoạt động theo thông tin tra cứu thuế.
+  - Mã số thuế không đồng nhất giữa các chứng từ.
   - Thời gian thành lập dưới 12 tháng (tính từ ngày đăng ký lần đầu trên giấy Đăng ký Kinh doanh).
 
 - **Hoạt động kinh doanh:**
-  - Ngành nghề kinh doanh thực tế không phù hợp với thông tin trên các chứng từ.
   - Doanh nghiệp không hoạt động theo kết quả thẩm định thực tế.
 
 - **Tài chính doanh nghiệp:**
@@ -238,8 +238,8 @@ Normal — còn lại.
 - Nhận xét: chỉ tổng hợp thông tin KH cung cấp; cảnh báo khi doanh thu kế hoạch tăng mạnh không có cơ sở, mâu thuẫn với khảo sát thực địa hoặc kết quả kinh doanh lịch sử.
 
 **6. Kết luận nguồn thu doanh nghiệp** [code phân nhóm + giá trị; LLM viết nhận xét]
-- Bad corp (≥ 1 tiêu chí): DN không hoạt động theo tra cứu thuế, thông tin pháp lý không phù hợp giữa các chứng từ, thời gian thành lập < 12 tháng; DN không hoạt động theo thẩm định thực tế; Bad finance; Bad bureau → khuyến nghị KHÔNG sử dụng nguồn thu doanh nghiệp, không đánh giá dự phóng.
-- Good corp: Good finance VÀ Good bureau. Normal corp: còn lại. Normal / Good → khuyến nghị sử dụng nguồn thu doanh nghiệp.
+- Bad corp (≥ 1 tiêu chí): DN không hoạt động theo tra cứu thuế hoặc DN không hoạt động theo thẩm định thực tế; mã số thuế không đồng nhất giữa các chứng từ; thời gian thành lập < 12 tháng; Bad finance hoặc Bad bureau → khuyến nghị KHÔNG sử dụng nguồn thu doanh nghiệp, không đánh giá dự phóng.
+- Good corp: Good finance VÀ Good bureau VÀ không phải Bad corp. Normal corp: còn lại. Normal / Good → khuyến nghị sử dụng nguồn thu doanh nghiệp.
 - Ô "KetLuanNguonThuDoanhNghiep": 1-3 câu theo đúng nhóm trong "phan_nhom_doanh_nghiep", nêu cơ sở. Ví dụ:
   - "Trên cơ sở KHDN thời gian thành lập < 12 tháng, hoạt động kinh doanh chưa ổn định, khuyến nghị không sử dụng nguồn thu doanh nghiệp để đánh giá năng lực trả nợ lần này."
   - "Trên cơ sở KHDN có nợ cần chú ý trong 12 tháng gần nhất, khuyến nghị không sử dụng nguồn thu doanh nghiệp để đánh giá năng lực trả nợ lần này."

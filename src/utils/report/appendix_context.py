@@ -42,7 +42,9 @@ NOT_OPERATING = ("tam_ngung", "ngung_hoat_dong", "giai_the", "pha_san")
 NOT_OPERATING_LABELS = ("Tạm ngừng hoạt động", "Ngừng hoạt động", "Giải thể", "Phá sản")
 # Finding codes (legal_checks.py) that mean "thông tin pháp lý không phù hợp".
 LEGAL_MISMATCH_CODES = ("tax_code_mismatch", "name_mismatch", "address_mismatch",
-                        "establishment_mismatch", "rep_mismatch")
+                        "establishment_mismatch", "rep_mismatch")          # cảnh báo 1b
+# [17/11] Bad corp: chỉ "mã số thuế không đồng nhất giữa các chứng từ"
+BAD_CORP_MISMATCH_CODES = ("tax_code_mismatch",)
 
 # Template prefix → field of financial_metrics (figures) or ratio name.
 FIGURE_PREFIXES = {
@@ -275,21 +277,19 @@ def first_registration(records: list[dict], items: dict | None = None) -> date |
     return min(dates) if dates else None
 
 
-LEGAL_MISMATCH_CODES = ("tax_code_mismatch", "name_mismatch", "address_mismatch", "rep_mismatch",
-                        "establishment_mismatch")
-
-
 def corp_group(items: dict, financials: dict, cic: dict, as_of: date,
                records: list[dict] | None = None) -> dict[str, Any]:
-    """Bad corp if ANY criterion; Good corp if Good finance AND Good bureau; else Normal."""
+    """[17/11] Bad corp if ANY criterion: DN không hoạt động (tra cứu thuế / thẩm định thực tế), MST không
+    đồng nhất giữa các chứng từ, thành lập < 12 tháng, Bad finance, Bad bureau.
+    Good corp = Good finance AND Good bureau AND not Bad corp; else Normal corp."""
 
     codes = _codes(items, 1)
     bad: list[str] = []
     if "status_not_active" in codes:
         bad.append("Pháp lý: " + codes["status_not_active"]["message"])
-    # [Guidance final 13/11] thông tin pháp lý không phù hợp giữa các chứng từ (MST, tên, TSC, NĐDPL,
-    # năm thành lập) → Bad corp
-    for code in LEGAL_MISMATCH_CODES:
+    # [17/11] chỉ mã số thuế không đồng nhất giữa các chứng từ → Bad corp; lệch tên, TSC, NĐDPL,
+    # ngày thành lập chỉ cảnh báo ở 1b
+    for code in BAD_CORP_MISMATCH_CODES:
         if code in codes:
             bad.append("Pháp lý: " + codes[code]["message"])
     founded = first_registration(records or [], items)          # [05/11] ngày đăng ký lần đầu

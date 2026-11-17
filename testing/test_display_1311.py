@@ -208,3 +208,26 @@ class Tighten1311Test(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class CorpGroup1711Test(unittest.TestCase):
+    """[17/11] Bad corp: chỉ MST không đồng nhất trong các lệch pháp lý; Good = Good finance & Good bureau & không Bad."""
+
+    def group(self, *codes, finance="Good finance", bureau="Good bureau"):
+        from datetime import date
+        from src.utils.report.appendix_context import corp_group
+        items = {1: {"summary": {}, "findings": [{"code": c, "message": c, "severity": "warning"} for c in codes]}}
+        return corp_group(items, {"group": finance, "group_reason": ""}, {"group": bureau, "group_reason": ""},
+                          date(2026, 11, 17), records=[])
+
+    def test_only_tax_code_mismatch_is_bad_corp(self):
+        self.assertEqual(self.group("tax_code_mismatch")["group"], "Bad corp")
+        for code in ("name_mismatch", "address_mismatch", "rep_mismatch", "establishment_mismatch"):
+            self.assertEqual(self.group(code)["group"], "Good corp", code)
+
+    def test_good_and_normal(self):
+        self.assertEqual(self.group()["group"], "Good corp")
+        self.assertEqual(self.group(bureau="Normal bureau")["group"], "Normal corp")
+        self.assertEqual(self.group(finance="Bad finance")["group"], "Bad corp")
+        self.assertEqual(self.group("site_not_operating")["group"], "Bad corp")
+        self.assertEqual(self.group("status_not_active")["group"], "Bad corp")
