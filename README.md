@@ -135,6 +135,9 @@ no Python change, as long as the `{{placeholders}}` stay.
 
 ## Who computes what
 
+[18/11] Bảng chi tiết từng ô của output (hồ sơ nguồn, CODE / LLM, luật, file đối chiếu):
+`docs/TRUY-NGUON-OUTPUT.md`.
+
 | Rule (BRD 27/10) | Done by | Where |
 |---|---|---|
 | Field priority ĐKKD → Điều lệ / Sổ cổ đông → thực địa; mismatches; status; 12-month changes; borrower %, NĐDPL | code | `calculator/legal_checks.py`, `utils/report/appendix_context.py` |
@@ -145,7 +148,7 @@ no Python change, as long as the `{{placeholders}}` stay.
 | Bad / Normal / Good corp | code | `appendix_context.corp_group` |
 | Giá trị nguồn thu: LNST hợp lý, or projection with PAKD (min[PAKD; DT × (1 + tăng trưởng ngành × 1,5 if Good corp)], ROS = min{PAKD; max[lịch sử; ngành]}); LNST trả nợ TDH; lợi tức tối đa cho KHCN | code | `financial_metrics.income_estimate` |
 | Sản phẩm/dịch vụ, địa chỉ, nhận xét HĐKD, kết luận (wording) | LLM, framed by `corp-income-cell-specs.md` | `agents/report_writer.py` |
-| Nhận xét pháp lý, nhận xét tài chính | code draft, rewritten by the LLM; a rewrite that drops a number is rejected | `agents/specialist.py` (`POLISH_CELLS`) |
+| Nhận xét pháp lý (cảnh báo 1b), nhận xét tài chính 3a / 3b | code only (`POLISH_CELLS` is empty — no LLM rewrite) | `appendix_context.py`, `financial_metrics.py` |
 
 ---
 
